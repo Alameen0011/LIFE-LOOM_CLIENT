@@ -21,7 +21,11 @@ import HomePage from "@/pages/UserPages/HomePage";
 import ProductDetails from "@/pages/UserPages/ProductDetails";
 import Shop from "@/pages/UserPages/Shop";
 import RedirectAuthenticatedAdmin from "./ProtectedRoutes/RedirectAuthenticateAdmin";
-import Profile from "@/components/users/Profile/Profile";
+import MyProfile from "@/components/users/Profile/MyProfile";
+import MyAddress from "@/components/users/Profile/MyAddress";
+import MyNewAddress from "@/components/users/Profile/MyNewAddress";
+import MyResetPassword from "@/components/users/Profile/MyResetPassword";
+import MyEditAddress from "@/components/users/Profile/MyEditAddress";
 
 const router = createBrowserRouter([
   {
@@ -33,21 +37,33 @@ const router = createBrowserRouter([
 
       { path: "/products", element: <Shop /> },
       { path: "/products/:id", element: <ProductDetails /> },
+      {path:"/cart", element:<Cart/>}
       { path: "*", element: <NotFoundPage /> },
       {
         path: "/wishlist",
-        element: <RequireUserAuth />,  // Protected route
+        element: <RequireUserAuth />, // Protected route
         children: [
-          { path: "", element: <WhishlistPage /> },  // Child route
+          { path: "", element: <WhishlistPage /> }, // Child route
         ],
       },
       {
         path: "/profile",
-        element: <RequireUserAuth />,  // Protected route
+        element: <RequireUserAuth />, // Protected route
         children: [
-          { path: "", element: <Profile /> },  // Child route
+          { path: "myProfile", element: <MyProfile /> }, // Child route
+          { path: "myAddress", element: <MyAddress /> }, // Child route
+          { path: "addAddress", element: <MyNewAddress /> }, // Child route
+          { path: "myResetPassword", element: <MyResetPassword /> }, // Child route
+          { path: "editProfile/:id", element: <MyEditAddress /> }, // Child route
         ],
       },
+      {
+        path:"/order",
+        element:<RequireUserAuth/>,
+        children: [
+     
+        ]
+      }
     ],
   },
   {

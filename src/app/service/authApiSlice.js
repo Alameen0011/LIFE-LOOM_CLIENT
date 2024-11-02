@@ -1,57 +1,5 @@
 import { apiSlice } from "./apiSlice";
 
-// const baseQuery = fetchBaseQuery({
-//   baseUrl: import.meta.env.VITE_SERVER_URL,
-//   credentials: "include",
-//   prepareHeaders: (headers, { getState }) => {
-//     console.log("Current State:", getState());
-//     const token = getState().userAuth.accessToken;
-//     console.log(
-//       "Included token and basequery taking token and putting it in api",
-//       token
-//     );
-//     console.log(token, "Token");
-//     if (token) {
-//       headers.set("authorization", `Bearer ${token}`);
-//     }
-//     return headers;
-//   },
-// });
-
-// const baseQueryWithReauth = async (args, api, extraOptions) => {
-//   console.log("Requesting with Refresh Token...");
-//   let result = await baseQuery(args, api, extraOptions);
-//   console.log("Initial Result:", result);
-
-//   if (result.error && result.error.status === 401) {
-//     console.log("Token expired, attempting to refresh...");
-//     // Try to get a new token using the refresh token
-//     const refreshResult = await baseQuery(
-//       "/user/auth/access",
-//       api,
-//       extraOptions
-//     );
-
-//     if (refreshResult.data) {
-//       console.log("Token refreshed successfully:", refreshResult.data);
-//       // Store the new token in state
-//       api.dispatch(
-//         setAccessToken({ accessToken: refreshResult.data.accessToken })
-//       );
-//       // storing user info in state
-//       api.dispatch(setUserCredentials(refreshResult.data));
-
-//       // Retry the original query with the new access token
-//       result = await baseQuery(args, api, extraOptions);
-//     } else {
-//       console.log("Token refresh failed, logging out...");
-//       // If refresh fails, log out the user
-//       api.dispatch(userlogout());
-//     }
-//   }
-
-//   return result;
-// };
 
 export const authApiSlice = apiSlice.injectEndpoints({
     endpoints: (builder) => ({

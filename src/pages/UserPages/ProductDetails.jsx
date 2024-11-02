@@ -20,6 +20,14 @@ const ProductDetails = () => {
   console.log(id, "id from params");
 
   const { data: productData, error, isLoading } = useGetSingleProductQuery(id);
+
+  const handleAddToCart = () => {
+    
+  }
+
+
+
+
   if (isLoading) {
     return (
       <Box
@@ -177,7 +185,7 @@ const ProductDetails = () => {
 
           {/* Action Buttons */}
           <div className="flex gap-4 mb-6">
-            <Button className="flex-1 bg-black text-white py-2 px-4 rounded-md font-primary hover:bg-black transition duration-200">
+            <Button onClick={handleAddToCart} className="flex-1 bg-black text-white py-2 px-4 rounded-md font-primary hover:bg-black transition duration-200">
               Add to Cart
             </Button>
             <button className="border border-gray-300 p-2 rounded-md hover:bg-gray-100">

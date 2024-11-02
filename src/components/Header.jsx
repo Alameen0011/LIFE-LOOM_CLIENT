@@ -128,7 +128,7 @@ const Header = () => {
                 />
               </svg>
             </Link>
-            <Link to="/profile" className="text-gray-600 hover:text-gray-900">
+            <Link to="/profile/myProfile" className="text-gray-600 hover:text-gray-900">
               <svg
                 width="20"
                 height="21"
