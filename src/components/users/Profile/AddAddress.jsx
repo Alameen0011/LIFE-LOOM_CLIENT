@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Link, useNavigate } from "react-router-dom";
@@ -8,6 +8,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAddAddressMutation } from "@/app/service/userApiSlice";
 import { toast } from "react-toastify";
+import { ChevronRight } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const AddAddress = () => {
   const {
@@ -21,7 +23,9 @@ const AddAddress = () => {
   const navigate = useNavigate()
 
   const handleAddAddress = async (data) => {
+    data.isDefault = Boolean(data.isDefault);
     console.log(data, "data on adding address");
+
     const res = await addAddress(data).unwrap()
     if(res.success){
       console.log(res,"response from adding address APi")
@@ -33,138 +37,108 @@ const AddAddress = () => {
   
   };
 
+
+
   return (
     <div className="flex-1 p-6">
-      <div className="mb-6 flex items-center gap-2 text-sm text-muted-foreground">
-        <Link href="#" className="hover:text-foreground">
-          Home
-        </Link>
-        <span>/</span>
-        <Link href="#" className="hover:text-foreground">
-          Accounts
-        </Link>
-        <span>/</span>
-        <Link href="#" className="hover:text-foreground">
-          Delivery address
-        </Link>
-        <span>/</span>
-        <span className="text-foreground">Add new address</span>
-      </div>
+    <nav className="mb-6 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+      <Link to="/" className="hover:text-foreground">
+        Home
+      </Link>
+      <ChevronRight className="h-4 w-4" />
+      <Link to="/accounts" className="hover:text-foreground">
+        Accounts
+      </Link>
+      <ChevronRight className="h-4 w-4" />
+      <Link to="/profile/myAddress" className="hover:text-foreground">
+        Delivery address
+      </Link>
+      <ChevronRight className="h-4 w-4" />
+      <span className="text-foreground font-medium">Add new address</span>
+    </nav>
 
-      <Card>
-        <CardContent className="p-6">
-          <form onSubmit={handleSubmit(handleAddAddress)} className="space-y-6">
-            <h2>Add address</h2>
-
-            <div className="grid gap-4 md:grid-cols-3">
-              <div className="space-y-2">
-                <Label htmlFor="state">State</Label>
-                <Input {...register("state")} id="state" placeholder="Mary" />
-                <div className="min-h-[10px]">
-                  {errors.state && (
-                    <span className="text-red-500 text-sm font-tertiary ">
-                      {errors?.state?.message}
-                    </span>
-                  )}
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="district">District</Label>
-                <Input
-                  {...register("district")}
-                  id="district"
-                  placeholder="Mary"
-                />
-                <div className="min-h-[10px]">
-                  {errors.district && (
-                    <span className="text-red-500 text-sm font-tertiary ">
-                      {errors?.district?.message}
-                    </span>
-                  )}
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="city">City</Label>
-                <Input {...register("city")} id="city" placeholder="Mary" />
-                <div className="min-h-[10px]">
-                  {errors.city && (
-                    <span className="text-red-500 text-sm font-tertiary ">
-                      {errors?.city?.message}
-                    </span>
-                  )}
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="addressType">Address Name</Label>
-                <Input
-                  {...register("addressName")}
-                  id="addressType"
-                  placeholder="Mary"
-                />
-                <div className="min-h-[10px]">
-                  {errors.addressName && (
-                    <span className="text-red-500 text-sm font-tertiary ">
-                      {errors?.addressName?.message}
-                    </span>
-                  )}
-                </div>
-              </div>
-            </div>
-
+    <Card className="max-w-2xl mx-auto">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-2xl">
+        
+          Add New Address
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit(handleAddAddress)} className="space-y-6">
+          <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
             <div className="space-y-2">
-              <Label htmlFor="address">Address</Label>
-              <Input
-                {...register("address")}
-                id="address"
-                placeholder="House Name, House Number, Locality"
-              />
-              <div className="min-h-[10px]">
-                {errors.address && (
-                  <span className="text-red-500 text-sm font-tertiary ">
-                    {errors?.address?.message}
-                  </span>
-                )}
-              </div>
+              <Label htmlFor="state">State</Label>
+              <Input {...register("state")} id="state" placeholder="Enter state" />
+              {errors.state && (
+                <span className="text-red-500 text-sm">{errors.state.message}</span>
+              )}
             </div>
-
             <div className="space-y-2">
-              <Label htmlFor="pinCode">Pin Code</Label>
-              <Input
-                {...register("pincode")}
-                id="pinCode"
-                placeholder="Mary"
-                className="max-w-[200px]"
-              />
-              <div className="min-h-[10px]">
-                {errors.pincode && (
-                  <span className="text-red-500 text-sm font-tertiary ">
-                    {errors?.pincode?.message}
-                  </span>
-                )}
-              </div>
+              <Label htmlFor="district">District</Label>
+              <Input {...register("district")} id="district" placeholder="Enter district" />
+              {errors.district && (
+                <span className="text-red-500 text-sm">{errors.district.message}</span>
+              )}
             </div>
-
-            {/* Mark as Default Address Checkbox */}
             <div className="space-y-2">
-              <label className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  {...register("isDefault")}
-                  className="form-checkbox"
-                />
-                <span>Mark as default address</span>
-              </label>
+              <Label htmlFor="city">City</Label>
+              <Input {...register("city")} id="city" placeholder="Enter city" />
+              {errors.city && (
+                <span className="text-red-500 text-sm">{errors.city.message}</span>
+              )}
             </div>
+            <div className="space-y-2 sm:col-span-2 md:col-span-3">
+              <Label htmlFor="addressName">Address Name</Label>
+              <Input {...register("addressName")} id="addressName" placeholder="E.g., Home, Office, etc." />
+              {errors.addressName && (
+                <span className="text-red-500 text-sm">{errors.addressName.message}</span>
+              )}
+            </div>
+          </div>
 
-            <div className="flex justify-end">
-              <Button className="bg-black text-white hover:bg-black/90">
-                Add
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
-    </div>
+          <div className="space-y-2">
+            <Label htmlFor="address">Full Address</Label>
+            <Input
+              {...register("address")}
+              id="address"
+              placeholder="House Name, House Number, Locality"
+            />
+            {errors.address && (
+              <span className="text-red-500 text-sm">{errors.address.message}</span>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="pinCode">Pin Code</Label>
+            <Input
+              {...register("pincode")}
+              id="pinCode"
+              placeholder="Enter 6-digit pin code"
+              className="max-w-[200px]"
+            />
+            {errors.pincode && (
+              <span className="text-red-500 text-sm">{errors.pincode.message}</span>
+            )}
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <Checkbox id="isDefault" {...register("isDefault")} />
+            <Label htmlFor="isDefault">Mark as default address</Label>
+            {errors.isDefault && (
+              <span className="text-red-500 text-sm">{errors.isDefault.message}</span>
+            )}
+          </div>
+
+          <div className="flex justify-end">
+            <Button type="submit" className="bg-primary text-primary-foreground hover:bg-primary/90" disabled={isLoading}>
+              {isLoading ? "Adding..." : "Add Address"}
+            </Button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
+  </div>
   );
 };
 

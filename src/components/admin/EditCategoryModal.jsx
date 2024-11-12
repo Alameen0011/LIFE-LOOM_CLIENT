@@ -4,10 +4,12 @@ import { addCategorySchema } from '@/validationSchemas/addCategory';
 
 const EditCategoryModal = ({category,isOpen,onClose,onSave}) => {
 
-    const {register,handleSubmit, formState: { errors }} = useForm({resolver:zodResolver(addCategorySchema)})
+    const {register,handleSubmit,reset, formState: { errors }} = useForm({resolver:zodResolver(addCategorySchema)})
 
     const onSubmit = (data) => {
+      console.log({...category,...data},"spreading on submit")
         onSave({ ...category, ...data });
+        reset()
       };
 
       if (!isOpen) return null;

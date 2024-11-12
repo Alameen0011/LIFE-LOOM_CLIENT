@@ -1,8 +1,16 @@
-import React from 'react'
+import SideBar from '../Profile/SideBar'
+import OrderHistory from './orderHistory'
 
 const MyOrder = () => {
   return (
-    <div>MyOrders</div>
+    <div className="flex min-h-screen mx-auto max-w-5xl my-10 bg-background">
+    {/* Sidebar */}
+    <SideBar />
+
+    {/* Main Content */}
+    <OrderHistory/>
+    
+  </div>
   )
 }
 

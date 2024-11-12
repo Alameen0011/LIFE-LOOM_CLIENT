@@ -17,6 +17,15 @@ export const userApiSlice = apiSlice.injectEndpoints({
         body: userData,
       }),
     }),
+    ResetUserPassword:builder.mutation({
+      query:(resetData) => ({
+        url:"/user/resetPassword",
+        method:"PATCH",
+        body:resetData
+      })
+    }),
+ 
+ 
 
     //Address management api's
 
@@ -26,6 +35,7 @@ export const userApiSlice = apiSlice.injectEndpoints({
         method: "POST",
         body: addressData,
       }),
+      invalidatesTags:["FetchAddress"]
     }),
 
     getAllAddress: builder.query({
@@ -33,13 +43,15 @@ export const userApiSlice = apiSlice.injectEndpoints({
         url: "/user/getAllAddress",
         method: "GET",
       }),
+      providesTags:["FetchAddress"]
     }),
 
     getSingleAddress:builder.query({
         query: (id) => ({
             url:`/user/getSingleAddress/${id}`,
             method:"GET"
-        })
+        }),
+        
     }),
 
     updateAddress:builder.mutation({
@@ -47,8 +59,34 @@ export const userApiSlice = apiSlice.injectEndpoints({
             url:`/user/updateAddress/${id}`,
             method:"PUT",
             body:updateAddressData
-        })
+        }),
+        invalidatesTags:["FetchAddress"]
+    }),
+    deleteAddress:builder.mutation({
+      query:(id) => ({
+        url:`/user/deleteAddress/${id}`,
+        method:"DELETE",
+
+      }),
+      invalidatesTags:["FetchAddress"]
+    }),
+
+    ///Category management 
+    getActiveCategory:builder.query({
+      query:() => ({
+        url:"/user/getActiveCategory",
+        method:"GET"
+
+      }),
+    }),
+
+    getHomeProducts:builder.query({
+      query:() => ({
+        url:"/user/homeProducts",
+        method:"GET"
+      })
     })
+
 
 
 
@@ -63,4 +101,8 @@ export const {
   useGetAllAddressQuery,
   useGetSingleAddressQuery,
   useUpdateAddressMutation,
+  useGetActiveCategoryQuery,
+  useResetUserPasswordMutation,
+  useDeleteAddressMutation,
+  useGetHomeProductsQuery
 } = userApiSlice;

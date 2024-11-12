@@ -1,7 +1,7 @@
-import React from 'react'
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { useNavigate } from 'react-router-dom'
+import React, { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useNavigate } from "react-router-dom";
 import {
   Table,
   TableBody,
@@ -9,45 +9,60 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { PlusCircle, Search, Edit, Trash2 } from "lucide-react"
-import { useFetchProductsQuery, useSoftDeleteProductMutation } from '@/app/service/adminApiSlice'
-import { toast } from 'react-toastify'
-
-
-
+} from "@/components/ui/table";
+import { PlusCircle, Search, Edit, Trash2 } from "lucide-react";
+import {
+  useFetchProductsQuery,
+  useSoftDeleteProductMutation,
+} from "@/app/service/adminApiSlice";
+import { toast } from "react-toastify";
+import Pagination from "../users/Pagination";
 
 const ProductList = () => {
-    const navigate = useNavigate()
+  const navigate = useNavigate();
 
-    const {data,error,isLoading} = useFetchProductsQuery()
-    const [productSoftDelete] = useSoftDeleteProductMutation()
+  //-------------------Pagination------------------//
+  const itemsPerPage = 4;
+  const [totalPages, setTotalPages] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-    if (isLoading) console.log("Loading...");
-     if (error) console.log("Error:", error);
+  const { data, error, isLoading } = useFetchProductsQuery({
+    page: currentPage,
+    limit: itemsPerPage,
+  });
+  const [productSoftDelete] = useSoftDeleteProductMutation();
 
+  if (isLoading) console.log("Loading...");
+  if (error) console.log("Error:", error);
 
-    console.log(data,"hello")
+  console.log(data, "hello");
 
-    const handleSoftDelete = async(productId) => {
-      console.log("going to soft delele")
-  
-
-      const res = await productSoftDelete(productId)
-
-      console.log(res)
-
-      toast.success("deleted successfully")
-
+  const handleSoftDelete = async (productId) => {
+    console.log("going to soft delele");
+    try {
+      const res = await productSoftDelete(productId).unwrap();
+      console.log(res,"response from softDeleting api")
+      if (res.success) {
+        toast.success("successfully softly deleted ");
+      }
+    } catch (error) {
+      console.log(error,"error while deleting product")
+      toast.error(error?.data?.message)
     }
+  };
 
-    const handleEditProduct = (productId) => {
-      console.log("going to edit product",productId)
-      navigate(`/admin/products/edit/${productId}`)
-    }
+  const handleEditProduct = (productId) => {
+    console.log("going to edit product", productId);
+    navigate(`/admin/products/edit/${productId}`);
+  };
+  console.log(currentPage, "current page");
+  console.log(totalPages, "totoal pages");
 
-
-
+  useEffect(() => {
+    setCurrentPage(data?.page);
+    setTotalPages(data?.totalPages);
+  }, [data]);
 
   return (
     <div className="container max-w-3xl mx-auto py-10">
@@ -57,7 +72,7 @@ const ProductList = () => {
           <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input placeholder="Search products" className="pl-8" />
         </div>
-        <Button onClick = {() => navigate('/admin/addProduct')}>
+        <Button onClick={() => navigate("/admin/addProduct")}>
           <PlusCircle className="mr-2 h-4 w-4" /> Add New Product
         </Button>
       </div>
@@ -85,8 +100,10 @@ const ProductList = () => {
                     className="rounded-md"
                   />
                 </TableCell>
-                <TableCell className="font-medium">{product.productName}</TableCell>
-                <TableCell>{product.category.categoryName}</TableCell>
+                <TableCell className="font-medium">
+                  {product.productName}
+                </TableCell>
+                <TableCell>{product?.category?.categoryName}</TableCell>
                 <TableCell>₹{product.price.toFixed(2)}</TableCell>
                 <TableCell>
                   <span
@@ -102,10 +119,20 @@ const ProductList = () => {
                   </span>
                 </TableCell>
                 <TableCell className="text-right">
-                  <Button onClick = {() => handleEditProduct(product._id)}    variant="ghost" size="icon" className="mr-2">
+                  <Button
+                    onClick={() => handleEditProduct(product._id)}
+                    variant="ghost"
+                    size="icon"
+                    className="mr-2"
+                  >
                     <Edit className="h-4 w-4" />
                   </Button>
-                  <Button onClick={() => handleSoftDelete(product._id)} variant="ghost" size="icon" className="text-red-500">
+                  <Button
+                    onClick={() => handleSoftDelete(product._id)}
+                    variant="ghost"
+                    size="icon"
+                    className="text-red-500"
+                  >
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </TableCell>
@@ -114,8 +141,14 @@ const ProductList = () => {
           </TableBody>
         </Table>
       </div>
-    </div>
-  )
-}
 
-export default ProductList
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages || 0}
+        paginate={paginate}
+      />
+    </div>
+  );
+};
+
+export default ProductList;

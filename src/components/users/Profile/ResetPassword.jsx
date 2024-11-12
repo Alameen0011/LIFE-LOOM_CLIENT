@@ -1,60 +1,136 @@
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Home } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { ChevronRight, KeyRound } from "lucide-react";
+import { Link } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ResetPasswordSchema } from "@/validationSchemas/resetPassword";
+import { useResetUserPasswordMutation } from "@/app/service/userApiSlice";
+import { toast } from "react-toastify";
 
 const ResetPassword = () => {
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm({ resolver: zodResolver(ResetPasswordSchema) });
+
+  const [ResetPassword, { isLoading }] = useResetUserPasswordMutation();
+
+  const resetPasswordForm = async (data) => {
+    try {
+      console.log(data, "data from reset password form");
+
+      const res = await ResetPassword(data).unwrap();
+
+      console.log(res, "response form reset password api");
+      toast.success(res.message)
+      reset()
+    } catch (error) {
+      console.log(error, "error while reseting the password");
+      toast.error(error.data.message)
+      reset()
+
+    }
+  };
+
   return (
-   
     <div className="flex-1 p-6">
-    <div className="mb-6 flex items-center gap-2 text-sm text-gray-500">
-      <Link href="#" className="hover:text-gray-900">
-        <Home className="h-4 w-4" />
-        <span className="sr-only">Home</span>
-      </Link>
-      <span>/</span>
-      <Link href="#" className="hover:text-gray-900">
-        Accounts
-      </Link>
-      <span>/</span>
-      <span className="text-gray-900">change password</span>
+      <nav className="flex items-center space-x-2 text-sm text-muted-foreground mb-8">
+        <Link href="/" className="hover:text-primary transition-colors">
+          Home
+        </Link>
+        <ChevronRight className="h-4 w-4" />
+        <Link href="/accounts" className="hover:text-primary transition-colors">
+          Accounts
+        </Link>
+        <ChevronRight className="h-4 w-4" />
+        <span className="text-foreground font-medium">Change Password</span>
+      </nav>
+
+      <Card className="max-w-sm mx-auto">
+        <CardHeader className="text-center">
+          <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+            <KeyRound className="h-6 w-6 text-primary" />
+          </div>
+          <CardTitle className="text-2xl font-semibold font-primary">
+            Update Your Password
+          </CardTitle>
+          
+        </CardHeader>
+        <CardContent className="p-5">
+          <form
+            onSubmit={handleSubmit(resetPasswordForm)}
+            className="space-y-4"
+          >
+            <div className="space-y-2 font-primary">
+              <Label htmlFor="current-password ">Current Password</Label>
+              <Input
+                id="current-password"
+                type="password"
+                {...register("currentPassword")}
+                placeholder="Enter current password"
+              />
+              <div className="min-h-[5px]">
+                {errors.currentPassword && (
+                  <span className="text-red-500 text-sm font-tertiary ">
+                    {errors?.currentPassword?.message}
+                  </span>
+                )}
+              </div>
+            </div>
+            <div className="space-y-2 font-primary">
+              <Label htmlFor="new-password">New Password</Label>
+              <Input
+                id="new-password"
+                type="password"
+                placeholder="Enter new password"
+                {...register("newPassword")}
+              />
+              <div className="min-h-[5px]">
+                {errors.newPassword && (
+                  <span className="text-red-500 text-sm font-tertiary ">
+                    {errors?.newPassword?.message}
+                  </span>
+                )}
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label className=" font-primary" htmlFor="confirm-password">
+                Confirm Password
+              </Label>
+              <Input
+                id="confirm-password"
+                type="password"
+                placeholder="Confirm new password"
+                className="font-light font-primary"
+                {...register("confirmPassword")}
+              />
+              <div className="min-h-[5px]">
+                {errors.confirmPassword && (
+                  <span className="text-red-500 text-sm font-tertiary">
+                    {errors.confirmPassword.message}
+                  </span>
+                )}
+              </div>
+            </div>
+            <Button disabled={isLoading} className="max-w-36" type="submit">
+              {isLoading ? "updating .." : "update password"}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
     </div>
+  );
+};
 
-    <div className="mx-auto max-w-md space-y-6 rounded-lg border p-6">
-      <div className="text-center">
-        <h2 className="text-lg font-medium">Update your password for</h2>
-        <p className="text-sm text-gray-500">visguardi19@gmail.com</p>
-      </div>
-
-      <div className="space-y-4">
-        <div className="space-y-2">
-          <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-            current password
-          </label>
-          <Input type="password" placeholder="Enter current password" />
-        </div>
-
-        <div className="space-y-2">
-          <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-            new Password
-          </label>
-          <Input type="password" placeholder="Enter new password" />
-        </div>
-
-        <div className="space-y-2">
-          <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-            confirm password
-          </label>
-          <Input type="password" placeholder="Confirm new password" />
-        </div>
-
-        <Button className="w-full bg-black text-white hover:bg-gray-800">
-          update password
-        </Button>
-      </div>
-    </div>
-  </div>
-  )
-}
-
-export default ResetPassword
+export default ResetPassword;

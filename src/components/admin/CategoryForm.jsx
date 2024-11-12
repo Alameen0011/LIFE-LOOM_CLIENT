@@ -1,23 +1,47 @@
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { addCategorySchema } from "@/validationSchemas/addCategory"
-import { useAddCategoryMutation } from "@/app/service/adminApiSlice"
+import { useAddCategoryMutation, useFetchCategoriesQuery } from "@/app/service/adminApiSlice"
 import { toast } from "react-toastify"
-import { replace, useNavigate } from "react-router-dom"
+import {  useNavigate } from "react-router-dom"
 const CategoryForm = () => {
     const navigate = useNavigate()
     const { register,handleSubmit, formState:{errors}  } =useForm({ resolver:zodResolver(addCategorySchema)  })
-
-    const [addCategory,{data:addCategoryData}] = useAddCategoryMutation()
+     const [addCategory,{data:addCategoryData}] = useAddCategoryMutation()
+     const {data:existingCategoryData} = useFetchCategoriesQuery({page:1,limit:4})
 
     
     const onSubmit = async(data) => {
-        console.log(data);
+      console.log(data,"data on submission face");
+
+      const duplicate = existingCategoryData.categories.some((category) => category.categoryName.trim().toLowerCase() === data.categoryName.trim().toLowerCase());
+
+
+    if (duplicate) {
+      toast.error('Category name already exists. Please choose a different name.');
+      return;
+    }
+
+
+
+
+
+
+      try {
+        
         const res = await addCategory(data).unwrap()
         console.log(res)
         console.log(addCategoryData)
         toast.success(res?.message)
         navigate('/admin/categories',{replace:true})
+        
+      } catch (error) {
+        console.log(error,"Error while adding category")
+        toast.error(error?.data?.message)
+
+        
+      }
+
 
         
         // Here you can handle the data submission, e.g., send it to your API

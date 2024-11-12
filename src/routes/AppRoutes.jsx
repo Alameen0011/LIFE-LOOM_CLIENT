@@ -26,6 +26,14 @@ import MyAddress from "@/components/users/Profile/MyAddress";
 import MyNewAddress from "@/components/users/Profile/MyNewAddress";
 import MyResetPassword from "@/components/users/Profile/MyResetPassword";
 import MyEditAddress from "@/components/users/Profile/MyEditAddress";
+import CartPage from "@/pages/UserPages/Cart";
+import CheckoutPage from "@/pages/UserPages/CheckoutPage";
+import OrderSuccess from "@/pages/UserPages/OrderSuccess";
+import MyOrder from "@/components/users/order/MyOrder";
+import Order from "@/pages/adminPages/Order";
+import AuthWrapper from "./ProtectedRoutes/AuthWrapper";
+import OrderDetails from "@/components/users/order/OrderDetails";
+import AdminOrderDetails from "@/components/admin/AdminOrderDetails";
 
 const router = createBrowserRouter([
   {
@@ -34,44 +42,53 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage />,
     children: [
       { path: "/", element: <HomePage /> },
-
       { path: "/products", element: <Shop /> },
       { path: "/products/:id", element: <ProductDetails /> },
-      {path:"/cart", element:<Cart/>}
+
       { path: "*", element: <NotFoundPage /> },
+      {
+        path: "/cart",
+        element: <RequireUserAuth />,
+        children: [{ path: "", element: <CartPage /> }],
+      },
       {
         path: "/wishlist",
         element: <RequireUserAuth />, // Protected route
         children: [
-          { path: "", element: <WhishlistPage /> }, // Child route
+          { path: "", element: <WhishlistPage /> },
         ],
       },
       {
         path: "/profile",
         element: <RequireUserAuth />, // Protected route
         children: [
-          { path: "myProfile", element: <MyProfile /> }, // Child route
-          { path: "myAddress", element: <MyAddress /> }, // Child route
-          { path: "addAddress", element: <MyNewAddress /> }, // Child route
-          { path: "myResetPassword", element: <MyResetPassword /> }, // Child route
-          { path: "editProfile/:id", element: <MyEditAddress /> }, // Child route
+          { path: "orders", element: <MyOrder /> },
+          { path: "myProfile", element: <MyProfile /> },
+          { path: "order/:id", element: <OrderDetails /> }, 
+          { path: "myAddress", element: <MyAddress /> }, 
+          { path: "addAddress", element: <MyNewAddress /> },
+          { path: "myResetPassword", element: <MyResetPassword /> },
+          { path: "editProfile/:id", element: <MyEditAddress /> }, 
+          // Child route
         ],
       },
       {
-        path:"/order",
-        element:<RequireUserAuth/>,
+        path: "/order",
+        element: <RequireUserAuth />,
         children: [
-     
-        ]
-      }
+          { path: "checkout", element: <CheckoutPage /> },
+          { path: "confirmation", element: <OrderSuccess /> },
+        ],
+      },
     ],
   },
   {
     path: "/auth",
-    element: <MainLayout />,
+    element: <AuthWrapper />,
     errorElement: <ErrorPage />,
     children: [
       {
+        element: <MainLayout />,
         children: [
           { path: "login", element: <LoginPage /> },
           { path: "signup", element: <SignupPage /> },
@@ -123,6 +140,8 @@ const router = createBrowserRouter([
           { path: "products/edit/:productId", element: <EditProduct /> },
           { path: "categories", element: <AddCategory /> },
           { path: "addCategory", element: <CategoryForm /> },
+          { path: "orders", element: <Order /> },
+          { path: "orderDetails/:id", element: <AdminOrderDetails /> },
         ],
       },
     ],

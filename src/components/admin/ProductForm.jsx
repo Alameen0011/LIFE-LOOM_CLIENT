@@ -22,6 +22,8 @@ import {
 import { Slider } from "../ui/slider";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import Spinner from "../Spinner";
+import SpinnerOverlay from "../SpinnerOvarlay";
 
 const ProductForm = () => {
   const [selectedImageIndex, setSelectedImageIndex] = useState(null);
@@ -29,6 +31,7 @@ const ProductForm = () => {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+  const [loading,setLoading] = useState(false)
   const [product, setProduct] = useState({
     name: "",
     description: "",
@@ -44,7 +47,7 @@ const ProductForm = () => {
   const navigate = useNavigate();
 
   const { data, isLoading } = useFetchCategoriesQuery();
-  const [addProduct] = useAddProductMutation();
+  const [addProduct ,{isLoading:addProductLoading}] = useAddProductMutation();
 
   console.log(data);
 
@@ -209,6 +212,7 @@ const ProductForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("on submit");
+    setLoading(true)
     if (!validateForm()) {
       toast.error("Please add valid credentials");
       return;
@@ -258,6 +262,8 @@ const ProductForm = () => {
     } catch (error) {
       console.error("Error:", error);
       toast.error("Error adding product.");
+    }finally{
+      setLoading(false)
     }
   };
 
@@ -268,6 +274,7 @@ const ProductForm = () => {
           <h2 className="text-3xl font-bold">Add Product</h2>
           <p className="text-gray-500">Dashboard &gt; product &gt; add</p>
         </div>
+       
 
         <form onSubmit={handleSubmit} className="space-y-8">
           <Card>
@@ -391,9 +398,9 @@ const ProductForm = () => {
                         <SelectValue placeholder="Select Brand" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="riyah">Forum</SelectItem>
-                        <SelectItem value="abha">Yeso</SelectItem>
-                        <SelectItem value="boni">Abha</SelectItem>
+                        <SelectItem value="Forum">Forum</SelectItem>
+                        <SelectItem value="UrbanLeaf">UrbanLeaf</SelectItem>
+                        <SelectItem value="EarthAura">EarthAura</SelectItem>
                       </SelectContent>
                     </Select>
                     {errors.brand && (
@@ -489,13 +496,14 @@ const ProductForm = () => {
                   )}
                 </div>
 
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? "Uploading..." : "Add Product"}
+                <Button type="submit" className="w-full" disabled={addProductLoading}>
+                  {addProductLoading ? "Uploading..." : "Add Product"}
                 </Button>
               </div>
             </CardContent>
           </Card>
         </form>
+        {loading && <SpinnerOverlay message="Adding product..." color="red" />}
 
         {image && (
           <div className="fixed pt-10 inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">

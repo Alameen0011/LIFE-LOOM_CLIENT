@@ -1,13 +1,15 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Edit, MapPin } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ChevronRight, Edit, MapPin, Trash2 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { useGetAllAddressQuery } from "@/app/service/userApiSlice";
+import { useDeleteAddressMutation, useGetAllAddressQuery } from "@/app/service/userApiSlice";
+import { toast } from "react-toastify";
 
 const Address = () => {
   const navigate = useNavigate();
   const { data: addressData } = useGetAllAddressQuery();
+  const [deletAddress,{data:dltData,isLoading}] = useDeleteAddressMutation()
 
   console.log(addressData);
 
@@ -16,72 +18,102 @@ const Address = () => {
   };
 
   const handleEditAddress = (id) => {
+    console.log(id, "Edit address Id");
+    navigate(`/profile/editProfile/${id}`);
+  };
 
-    console.log(id,"Edit address Id")
-    navigate(`/profile/editProfile/${id}`)
-
-    
+  const handleDeleteAddress = async(id) => {
+    try {
+     const res =  await deletAddress(id).unwrap()
+     console.log(res,"response from deletion api")
+     if(res.success){
+      toast.success(res.message)
+     }
+    } catch (error) {
+      console.log(error,"error while deleting address")
+    }
   }
 
   return (
     <div className="flex-1 p-6">
-      <div className="mb-6 flex items-center gap-2 text-sm text-muted-foreground">
-        <Link href="#" className="hover:text-foreground">
-          Home
-        </Link>
-        <span>/</span>
-        <Link href="#" className="hover:text-foreground">
-          Accounts
-        </Link>
-        <span>/</span>
-        <span className="text-foreground">Delivery address</span>
-      </div>
+    <nav className="mb-6 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+      <Link to="/" className="hover:text-foreground">
+        Home
+      </Link>
+      <ChevronRight className="h-4 w-4" />
+      <Link to="/accounts" className="hover:text-foreground">
+        Accounts
+      </Link>
+      <ChevronRight className="h-4 w-4" />
+      <span className="text-foreground font-medium">Delivery Addresses</span>
+    </nav>
 
-      <div className="grid gap-6 md:grid-cols-2  lg:grid-cols-3 ">
-        {/* Add New Address Card */}
-        <Card className="flex h-[300px] flex-col items-center justify-center">
-          <CardContent className="flex flex-col items-center gap-4 p-6">
-            <div className="rounded-full bg-primary/10 p-4">
-              <MapPin className="h-6 w-6 text-primary" />
+    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {/* Add New Address Card */}
+      <Card className="flex h-[250px] flex-col items-center justify-center transition-shadow hover:shadow-md">
+        <CardContent className="flex flex-col items-center gap-4 p-6">
+          <div className="rounded-full bg-primary/10 p-4">
+            <MapPin className="h-6 w-6 text-primary" />
+          </div>
+          <Button onClick={handleAddAddress} variant="outline" className="w-full">
+            Add New Address
+          </Button>
+        </CardContent>
+      </Card>
+
+      {addressData?.addresses?.map((address) => (
+        <Card key={address._id} className="transition-shadow hover:shadow-md">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        
+            <CardTitle className="text-sm font-medium">
+              {address.addressName || "Address"}
+            </CardTitle>
+            <div className="flex space-x-2">
+              <Button
+                onClick={() => handleEditAddress(address._id)}
+                variant="ghost"
+                size="icon"
+                aria-label="Edit address"
+              >
+                <Edit className="h-4 w-4" />
+              </Button>
+              <Button
+                onClick={() => handleDeleteAddress(address._id)}
+                variant="ghost"
+                size="icon"
+                aria-label="Delete address"
+              >
+                <Trash2 className="h-4 w-4 text-destructive" />
+              </Button>
             </div>
-            <Button onClick={handleAddAddress} variant="outline">
-              add new address
-            </Button>
+          </CardHeader>
+          <CardContent className="pt-2">
+            <div className="grid gap-2">
+              <div className="font-medium">{address?.state}</div>
+              <div className="text-sm text-muted-foreground">
+                {address?.district}, {address?.city}
+              </div>
+              <div className="text-sm text-muted-foreground">
+                {address?.address}
+              </div>
+              <div className="text-sm text-muted-foreground">
+                PIN: {address?.pincode}
+              </div>
+              <div className="text-sm text-muted-foreground">
+                Phone: {address?.user?.phone}
+              </div>
+              {address.isDefault && (
+                 <div className="mt-2 inline-flex items-center">
+                 <span className="w-2 h-2 bg-primary rounded-full" />
+               </div>
+              )}
+           
+            </div>
           </CardContent>
         </Card>
-
-        {addressData?.addresses?.map((address) => (
-          <Card key={address._id}>
-            <CardContent className="p-6">
-              <div className="flex justify-between">
-                <div className="mb-4 h-2 w-2 rounded-full bg-primary" />
-                <Button onClick={() => handleEditAddress(address._id)} variant="ghost" size="icon">
-                  <Edit className="h-4 w-4" />
-                </Button>
-              </div>
-              <div className="grid gap-2">
-                <div className="font-medium">{address?.state}</div>
-                <div className="text-sm text-muted-foreground">
-                  {address?.district}
-                </div>
-                <div className="text-sm text-muted-foreground">
-                  {address?.pincode}
-                </div>
-                <div className="text-sm text-muted-foreground">
-                  {address?.city}
-                </div>
-                <div className="text-sm text-muted-foreground">
-                  {address?.address}
-                </div>
-                <div className="text-sm text-muted-foreground">
-                  {address?.user?.phone}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      ))}
     </div>
+  </div>
   );
 };
 

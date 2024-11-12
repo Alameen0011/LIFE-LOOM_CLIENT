@@ -9,6 +9,16 @@ import {
   useUpdateUserProfileMutation,
 } from "@/app/service/userApiSlice";
 import { toast } from "react-toastify";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { ChevronRight } from "lucide-react";
 
 const AddProfile = () => {
   const {
@@ -29,118 +39,108 @@ const AddProfile = () => {
   };
 
   return (
-    <div className="flex-1 p-6">
-      <div className="mb-6 flex items-center gap-2 text-sm text-muted-foreground">
+    <div className="flex-1  p-6">
+      <div className=" mb-6 flex items-center gap-2 text-sm text-muted-foreground">
         <Link href="#" className="hover:text-foreground">
           Home
         </Link>
-        <span>/</span>
+        <ChevronRight className="h-4 w-4" />
         <Link href="#" className="hover:text-foreground">
           Accounts
         </Link>
-        <span>/</span>
-        <span className="text-foreground">Profile</span>
+        <ChevronRight className="h-4 w-4" />
+        <span className="text-foreground  font-medium ">Profile</span>
       </div>
 
-      <div className="mx-auto max-w-md space-y-6 rounded-lg border p-6">
-        <div className="text-center">
-          <h2 className="text-lg font-medium">Profile</h2>
-          <p className="text-sm text-gray-500"></p>
-        </div>
+      <Card className="w-full  max-w-2xl bg-gray-50 mx-auto">
+        <CardHeader>
+          <CardTitle className="text-2xl font-semibold font-primary">
+            Profile
+          </CardTitle>
+          <CardDescription className="font-primary">
+            Update your personal information
+          </CardDescription>
+        </CardHeader>
         <form onSubmit={handleSubmit(handleUpdateUser)}>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                First name
-              </label>
-              <Input
-                {...register("firstName")}
-                type="text"
-                placeholder="Enter you first name"
-                defaultValue={userData?.user?.firstName}
-              />
-              <div className="min-h-[10px]">
-                {" "}
-                {/* Reserve space for error messages */}
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="firstName" >
+                  First name
+                </Label>
+                <Input
+                  id="firstName"
+                  className="font-primary text-sm "
+                  defaultValue={userData?.user?.firstName}
+                  {...register("firstName")}
+                  placeholder="Enter your first name"
+                />
                 {errors.firstName && (
-                  <span className="text-red-500 text-sm font-tertiary">
-                    {errors?.firstName?.message}
-                  </span>
+                  <p className="text-sm text-red-500">
+                    {errors.firstName.message}
+                  </p>
                 )}
               </div>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                Last name
-              </label>
-              <Input
-                {...register("lastName")}
-                type="text"
-                placeholder="Enter  your lastname"
-                defaultValue={userData?.user?.lastName}
-              />
-              <div className="min-h-[10px]">
-                {" "}
-                {/* Reserve space for error messages */}
+              <div className="space-y-2">
+                <Label htmlFor="lastName">Last name</Label>
+                <Input
+                  id="lastName"
+                  defaultValue={userData?.user?.lastName}
+                  {...register("lastName")}
+                     className="font-primary text-sm "
+                  placeholder="Enter your last name"
+                />
                 {errors.lastName && (
-                  <span className="text-red-500 text-sm font-tertiary">
-                    {errors?.lastName?.message}
-                  </span>
+                  <p className="text-sm text-red-500">
+                    {errors.lastName.message}
+                  </p>
                 )}
               </div>
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                contant number
-              </label>
+              <Label htmlFor="phone">Phone number</Label>
               <Input
+                id="phone"
                 {...register("phone")}
                 type="tel"
-                placeholder="Enter your phone number"
                 defaultValue={userData?.user?.phone}
+                placeholder="Enter your phone number"
+                   className="font-primary text-sm "
               />
-              <div className="min-h-[10px]">
-                {" "}
-                {/* Reserve space for error messages */}
-                {errors.phone && (
-                  <span className="text-red-500 text-sm font-tertiary">
-                    {errors.phone.message}
-                  </span>
-                )}
-              </div>
+              {errors.phone && (
+                <p className="text-sm text-red-500">{errors.phone.message}</p>
+              )}
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                email
-              </label>
+              <Label htmlFor="email">Email</Label>
               <Input
+                id="email"
                 {...register("email")}
                 type="email"
-                placeholder="Enter new password"
                 defaultValue={userData?.user?.email}
+                   className="font-primary text-sm "
+                placeholder="Enter your email"
               />
-              <div className="min-h-[10px]">
-                {" "}
-                {/* Reserve space for error messages */}
-                {errors.email && (
-                  <span className="text-red-500 text-sm font-tertiary">
-                    {errors.email.message}
-                  </span>
-                )}
-              </div>
+              {errors.email && (
+                <p className="text-sm text-red-500">{errors.email.message}</p>
+              )}
             </div>
-
+          </CardContent>
+          <CardFooter>
             <Button
-              disabled={isLoading}
               type="submit"
-              className="w-full bg-black text-white hover:bg-gray-800"
+              className="w-full sm:w-auto"
+              disabled={isLoading}
             >
-              Save
+              {isLoading && (
+                // <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+                <h2>HII Loading</h2>
+              )}
+              {isLoading ? "Saving..." : "Save Changes"}
             </Button>
-          </div>
+          </CardFooter>
         </form>
-      </div>
+      </Card>
     </div>
   );
 };

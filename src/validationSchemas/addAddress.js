@@ -1,6 +1,6 @@
 import {z} from "zod"
 
-
+console.log("insider add adress schem")
 
 export const addressSchema = z.object({
 
@@ -29,6 +29,7 @@ export const addressSchema = z.object({
       .string()
       .length(6, { message: 'Pincode must be 6 digits' })
       .regex(/^\d+$/, { message: 'Pincode must only contain numbers' }),
+    
 
 
     

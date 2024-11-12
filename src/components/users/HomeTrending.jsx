@@ -1,12 +1,12 @@
-import { useGetProductsQuery } from "@/app/service/productApiSlice";
 import { Star } from "lucide-react";
 
 import { Card, CardContent } from "../ui/card";
 import { useNavigate } from "react-router-dom";
 import { Badge } from "../ui/badge";
+import { useGetHomeProductsQuery } from "@/app/service/userApiSlice";
 
 const HomeTrending = () => {
-  const { data: trending, isLoading } = useGetProductsQuery();
+  const { data: trending, isLoading } = useGetHomeProductsQuery();
   const navigate = useNavigate();
 
   if (isLoading) {

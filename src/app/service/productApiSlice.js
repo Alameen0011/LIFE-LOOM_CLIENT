@@ -5,11 +5,12 @@ console.log("insider product api slice")
 const productApiSlice = apiSlice.injectEndpoints({
     endpoints:(builder) => ({
         getProducts:builder.query({
-            query:() => ({
-                url:"/user/getProducts",
+            query:(queryParams) => ({
+                url:`/user/getProducts?${queryParams}`,
                 method:"GET",
                 
-            })
+            }),
+            providesTags:["FetchUserProductDetails"]
 
         }),
         getSingleProduct:builder.query({
@@ -19,6 +20,7 @@ const productApiSlice = apiSlice.injectEndpoints({
             })
             
         }),
+        
     
     })
 })

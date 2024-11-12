@@ -23,14 +23,16 @@ import {
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { getCroppedImg } from "@/utils/getCroppedImg";
+import SpinnerOverlay from "../SpinnerOvarlay";
 
 const EditProductForm = () => {
     
   const { productId } = useParams();
-  const { data,isLoading: productloading,isError: productError,} = useFetchSingleProductQuery(productId);
-  const { data: categoryData } = useFetchCategoriesQuery();
+  const { data,isLoading: productloading,isError: productError,refetch,isFetching} = useFetchSingleProductQuery(productId);
+  const { data: categoryData } = useFetchCategoriesQuery({page:1,limit:4});
   const [categories, setCategories] = useState([]);
   const [selectedImageIndex, setSelectedImageIndex] = useState(null);
+  const [loading , setLoading] = useState(false)
   const [image, setImage] = useState(null);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
@@ -52,41 +54,85 @@ const EditProductForm = () => {
 
   const [updateProducts,{isLoading:UpdationLoading}] = useUpdateProductMutation();
 
-
-  
-
   useEffect(() => {
     if (data) {
-      const productData = data.product;
+      console.log(data?.product, "data from fetching the API in useEffect");
+      const productData = data?.product;
+      console.log(productData, "product data --  ");
+      console.log("useEffect called");
+  
       setProduct({
         name: productData?.productName || "",
         description: productData?.description || "",
         price: productData?.price ? productData.price.toString() : "",
-        category: productData?.category._id|| "",
+        category: productData?.category._id || "",
         gender: productData?.gender || "",
         brand: productData?.brand || "",
         sku: productData?.sku || "",
         sizes: productData?.sizes
-          ? productData.sizes.reduce(
-              (acc, size) => {
-                acc[size.size] = size.stock.toString();
-                return acc;
-              },
-              { S: "", M: "", L: "", XL: "" }
-            )
+          ? productData.sizes.reduce((acc, size) => {
+              acc[size.size] = size.stock.toString();
+              return acc;
+            }, { S: "", M: "", L: "", XL: "" })
           : { S: "", M: "", L: "", XL: "" }, // Fallback default if sizes is undefined
         images: productData?.images || Array(4).fill(""),
       });
-    } 
-  }, [data]);
+    }
+  }, [data, productId]);
+  
+  const refetchData = () => {
+    refetch();
+    console.log("refetch data triggered");
+  };
+  
+  useEffect(() => {
+    console.log("product id changed");
+  
+    // Check if the refetch operation is in progress
+    if (productId && !isFetching) {
+      refetchData();
+      console.log("refetch data called");
+    }
+  }, [productId]);
+  
+  // If the API is fetching, you might want to prevent setting the state too early
+  useEffect(() => {
+    if (!isFetching && data) {
+      const productData = data?.product;
+      setProduct({
+        name: productData?.productName || "",
+        description: productData?.description || "",
+        price: productData?.price ? productData.price.toString() : "",
+        category: productData?.category._id || "",
+        gender: productData?.gender || "",
+        brand: productData?.brand || "",
+        sku: productData?.sku || "",
+        sizes: productData?.sizes
+          ? productData.sizes.reduce((acc, size) => {
+              acc[size.size] = size.stock.toString();
+              return acc;
+            }, { S: "", M: "", L: "", XL: "" })
+          : { S: "", M: "", L: "", XL: "" }, // Fallback default if sizes is undefined
+        images: productData?.images || Array(4).fill(""),
+      });
+    }
+  }, [data, isFetching]);
 
-    
   useEffect(() => {
     if (categoryData) {
         console.log(categoryData,"category data --  ")
       setCategories(categoryData.categories);
     }
   }, [categoryData]);
+
+  useEffect(() => {
+    console.log(product,"--product state")
+  },[product])
+
+
+
+    
+
 
   const validateFieldValues = (name, value) => {
     let error = "";
@@ -102,7 +148,7 @@ const EditProductForm = () => {
       case "description":
         if (!value.trim()) {
           error = "Description is required";
-        } else if (!/^[a-zA-Z0-9!$%&(){}'",. ]*$/.test(value.trim())) {
+        } else if (!/^[a-zA-Z0-9\s!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?&]*$/.test(value.trim())) {
           error = "Description should only contain letters, numbers, and specific punctuation.";
         }
         break;
@@ -241,6 +287,7 @@ const EditProductForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true)
 
     // Validate all fields
     const newErrors = {};
@@ -295,8 +342,10 @@ const EditProductForm = () => {
 
     try {
       const res = await updateProducts({productId: productId,body: updateProduct});
-
       console.log(res);
+  
+      console.log("cart fetched after updation of product")
+    
       if (res) {
         toast.success("product updated successfully");
         navigate("/admin/products");
@@ -304,8 +353,16 @@ const EditProductForm = () => {
     } catch (error) {
       console.log(error);
       toast.error("error in uploading product");
+    }finally{
+      setLoading(false)
     }
   };
+
+  if (!product) {
+    console.log(product,"product inside  heyyy")
+    return <div>Loading...</div>;
+  }
+  
 
   return (
     <div className="flex bg-gray-100 min-h-screen">
@@ -315,7 +372,7 @@ const EditProductForm = () => {
           <p className="text-gray-500">Dashboard &gt; product &gt; add</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-8">
+        <form onSubmit={handleSubmit}  className="space-y-8">
           <Card>
             <CardContent className="p-6">
               <div className="grid gap-6">
@@ -324,7 +381,7 @@ const EditProductForm = () => {
                     placeholder="Enter product Name"
                     label="Product Name"
                     name="name"
-                    value={product.name}
+                    value={product.name || ""}
                     onChange={handleChange}
                     error={errors.name} // Pass the error to the Input if your component supports it
                     max={20}
@@ -340,7 +397,7 @@ const EditProductForm = () => {
                     placeholder="Enter description"
                     label="Description"
                     name="description"
-                    value={product.description}
+                    value={product.description || ""}
                     onChange={handleChange}
                     error={errors.description}
                   />
@@ -355,7 +412,7 @@ const EditProductForm = () => {
                     placeholder="₹ 3000"
                     label="Price"
                     name="price"
-                    value={product.price}
+                    value={product.price || ""}
                     onChange={handleChange}
                     error={errors.price}
                     type="number"
@@ -386,8 +443,9 @@ const EditProductForm = () => {
                       onValueChange={(value) =>
                         setProduct({ ...product, category: value })
                       }
+                      value={product.category}
                     >
-                      <SelectTrigger>
+                      <SelectTrigger> 
                         <SelectValue placeholder="Select category" />
                       </SelectTrigger>
                       <SelectContent>
@@ -410,15 +468,13 @@ const EditProductForm = () => {
                       onValueChange={(value) =>
                         setProduct({ ...product, gender: value })
                       }
+                      value={product.gender} 
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Select Gender" />
+                      <SelectValue placeholder="Select a Gender" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="Male">Male</SelectItem>
-                        <SelectItem value="Female">Female</SelectItem>
-                        <SelectItem value="Kids">Kids</SelectItem>
-                        <SelectItem value="unisex">Unisex</SelectItem>
                       </SelectContent>
                     </Select>
                     {errors.gender && (
@@ -432,14 +488,15 @@ const EditProductForm = () => {
                       onValueChange={(value) =>
                         setProduct({ ...product, brand: value })
                       }
-                    >
+                      // value={product.brand} 
+                    > 
                       <SelectTrigger>
                         <SelectValue placeholder="Select Brand" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="riyah">Forum</SelectItem>
-                        <SelectItem value="abha">Yeso</SelectItem>
-                        <SelectItem value="boni">Abha</SelectItem>
+                        <SelectItem value="Forum">Forum</SelectItem>
+                        <SelectItem value="UrbanLeaf">UrbanLeaf</SelectItem>
+                        <SelectItem value="EarthAura">EarthAura</SelectItem>
                       </SelectContent>
                     </Select>
                     {errors.brand && (
@@ -538,6 +595,9 @@ const EditProductForm = () => {
             </CardContent>
           </Card>
         </form>
+        {
+          loading && <SpinnerOverlay message="editing product" color="green" />
+        }
 
         {image && (
           <div className="fixed pt-10 inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">

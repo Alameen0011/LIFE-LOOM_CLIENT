@@ -1,20 +1,35 @@
 import {
   useFetchCategoriesQuery,
+  useFetchProductsQuery,
   useSoftDeleteCategoryMutation,
   useUpdateCategoryMutation,
   useUpdateCategoryStatusMutation,
 } from "@/app/service/adminApiSlice";
 import { Edit, PlusCircle, Search, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import EditCategoryModal from "./EditCategoryModal";
 import { useNavigate } from "react-router-dom";
 import ConfirmActionModal from "./ConfirmActionModal";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { toast } from "react-toastify";
+import Pagination from "../users/Pagination";
 
 const CategoryList = () => {
-  const { data } = useFetchCategoriesQuery();
+
+
+
+
+  //---------pagination --------------//
+
+  const itemsPerPage = 4
+  const [totalPages, setTotalPages] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+
+
+  const { data } = useFetchCategoriesQuery({page:currentPage,limit:itemsPerPage});
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [isModalOpen, setModalOpen] = useState(false);
   const [isConfirmModalOpen, setConfirmModalOpen] = useState(false); // Manage confirm modal
@@ -22,9 +37,12 @@ const CategoryList = () => {
   const [categoryToDeactivate, setCategoryToDeactivate] = useState(null);
   const navigate = useNavigate();
 
+
+
   const [updateCategoryStatus] = useUpdateCategoryStatusMutation();
   const [softDeleteCategory] = useSoftDeleteCategoryMutation()
   const [updateCategory] = useUpdateCategoryMutation()
+
 
   console.log(data);
 
@@ -33,6 +51,7 @@ const CategoryList = () => {
     console.log("EDIT category", category);
     setSelectedCategory(category); // Set the category to be edited
     setModalOpen(true); // Open the modal
+
   };
 
   const handleModalClose = () => {
@@ -55,10 +74,23 @@ const CategoryList = () => {
   const handleModalSave = async(updatedCategory) => {
     console.log("Updated category:", updatedCategory);
     // Close the modal after saving
-    const res = await updateCategory(updatedCategory)
-    console.log(res,"response from editing category")
-    toast.success("category edited successFully")
-    setModalOpen(false);
+    try {
+      const res = await updateCategory(updatedCategory).unwrap()
+      console.log(res,"response from editing category")
+    
+      toast.success("category edited successFully")
+      
+    } catch (error) {
+      console.log(error,"error whiel updating category ")
+      toast.error(error?.data?.message)
+      
+    }finally{
+      setModalOpen(false);
+
+    }
+
+
+    // reset()
   };
 
   const handleToggleStatus = async (category) => {
@@ -70,6 +102,7 @@ const CategoryList = () => {
     } else {
       // If status is Inactive (trying to unblock), directly call API to activate
       const res = await updateCategoryStatus({ categoryId: category._id });
+
       console.log(res);
       toast.success("category unblocked successfully")
     }
@@ -86,12 +119,22 @@ const CategoryList = () => {
       } else if (actionType === "block") {
        const res =  await updateCategoryStatus({ categoryId: categoryToDeactivate._id });
        console.log(res,"response from updation of category status")
-       toast.success("category updated successFully")
+       if(res) 
+        toast.success("category blocked successFully")
+   
       }
       setConfirmModalOpen(false);
       setCategoryToDeactivate(null);
     }
   };
+
+  
+  useEffect(() => {
+
+    setCurrentPage(data?.page)
+    setTotalPages(data?.totalPages)
+
+  },[data])
 
   return (
     <div className="mt-8">
@@ -179,6 +222,11 @@ const CategoryList = () => {
           </tbody>
         </table>
       </div>
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages || 0}
+        paginate={paginate}
+      />
 
       {/* Edit Category Modal */}
       <EditCategoryModal

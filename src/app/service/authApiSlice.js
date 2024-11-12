@@ -1,8 +1,7 @@
 import { apiSlice } from "./apiSlice";
 
-
 export const authApiSlice = apiSlice.injectEndpoints({
-    endpoints: (builder) => ({
+  endpoints: (builder) => ({
     signup: builder.mutation({
       query: (userData) => ({
         url: "/user/auth/signup",
@@ -36,12 +35,12 @@ export const authApiSlice = apiSlice.injectEndpoints({
       query: (credentails) => ({
         url: "/user/auth/googleAuth",
         method: "POST",
-        body:credentails
+        body: credentails,
       }),
     }),
 
     getUser: builder.query({
-      query: () => "/user/auth/getUser", 
+      query: () => "/user/auth/getUser",
     }),
     getAccess: builder.query({
       query: () => "/user/auth/access",
@@ -52,11 +51,17 @@ export const authApiSlice = apiSlice.injectEndpoints({
         url: "/user/auth/logout",
         method: "POST",
       }),
-    
+    }),
+
+    fogotPassword: builder.mutation({
+      query: (data) => ({
+        url: "/user/auth/forgotPassword",
+        method: "POST",
+        body: data,
       }),
     }),
-  });
-
+  }),
+});
 
 export const {
   useSignupMutation,
@@ -66,7 +71,6 @@ export const {
   useLogoutUserMutation,
   useGetUserQuery,
   useGetAccessQuery,
-  useGoogleAuthMutation
-  
-
-} = authApiSlice
+  useGoogleAuthMutation,
+  useFogotPasswordMutation,
+} = authApiSlice;

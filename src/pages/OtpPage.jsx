@@ -60,12 +60,12 @@ const OtpPage = () => {
     const userEmail = localStorage.getItem('otpEmail');
     try {
       const res = await resendOtp({ email: userEmail }).unwrap();
-
+      console.log(res,"response from resending otp")
       toast.success(res.message || "Otp has been resent to your email addresss")
       console.log(res);
     } catch (error) {
       console.log(error,"Error in sending otp");
-      toast.error(error.message)
+      toast.error(error.data.message)
     }
     setIsResendDisabled(true);
     setTimer(60);

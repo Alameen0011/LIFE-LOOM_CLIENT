@@ -8,13 +8,14 @@ import { EditAddressSchema } from "@/validationSchemas/EditAddress";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
+import { ChevronRight } from "lucide-react";
 
 const EditAddress = () => {
    const {id} = useParams()
 
    console.log(id,"params id for editing")
 
-  const { data: singleAddress } = useGetSingleAddressQuery(id);
+  const { data: singleAddress,isLoading:SingleAddressLoading } = useGetSingleAddressQuery(id);
   const [updateAddress,{data,isLoading,isError}] = useUpdateAddressMutation()
   const navigate = useNavigate()
   const {register,handleSubmit,formState: { errors }} = useForm({ resolver: zodResolver(EditAddressSchema) });
@@ -42,15 +43,15 @@ const EditAddress = () => {
         <Link href="#" className="hover:text-foreground">
           Home
         </Link>
-        <span>/</span>
+        <ChevronRight className="h-4 w-4" />
         <Link href="#" className="hover:text-foreground">
           Accounts
         </Link>
-        <span>/</span>
+        <ChevronRight className="h-4 w-4" />
         <Link href="#" className="hover:text-foreground">
           Delivery address
         </Link>
-        <span>/</span>
+        <ChevronRight className="h-4 w-4" />
         <span className="text-foreground">Edit Address</span>
       </div>
 

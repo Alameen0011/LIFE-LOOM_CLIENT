@@ -1,37 +1,25 @@
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { FcGoogle } from "react-icons/fc"
-import { z } from "zod"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import {  useLocation, useNavigate } from "react-router-dom"
-import { toast } from "react-toastify"
-import { useDispatch } from "react-redux"
-import { signInWithPopup } from "firebase/auth"
-import { auth, provider } from "@/config/firebase"
-import { useGoogleAuthMutation, useUserLoginMutation } from "@/app/service/authApiSlice"
-import { setUserCredentials } from "@/app/slices/authSlice"
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { FcGoogle } from "react-icons/fc";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { useDispatch } from "react-redux";
+import { signInWithPopup } from "firebase/auth";
+import { auth, provider } from "@/config/firebase";
+import {
+  useGoogleAuthMutation,
+  useUserLoginMutation,
+} from "@/app/service/authApiSlice";
+import { setUserCredentials } from "@/app/slices/authSlice";
+import { loginSchema } from "@/validationSchemas/Login";
+
 const LoginForm = () => {
-
-  const loginSchema = z.object({
-    email: z
-    .string()
-    .trim()
-    .min(1, { message: "email is required" })
-    .email({ message: "Invalid email id" }),
-    password: z
-    .string()
-        .trim()
-        .min(1, { message: "password is required" })
-        .min(5, { message: "password must be atleat 5 character" })
-        .regex(/[a-z]/, { message: "Password must contain at least one lowercase letter" })
-        .regex(/[0-9]/, { message: "Password must contain at least one number" }),
-  });
- 
-  const navigate = useNavigate()
-  const dispatch = useDispatch()
-
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const {
     register,
@@ -39,131 +27,118 @@ const LoginForm = () => {
     formState: { errors },
   } = useForm({ resolver: zodResolver(loginSchema) });
 
-  const [userLogin,{isLoading}] = useUserLoginMutation()
-  const [googleAuth] = useGoogleAuthMutation()
-  const location = useLocation()
+  const [userLogin, { isLoading }] = useUserLoginMutation();
+  const [googleAuth] = useGoogleAuthMutation();
 
-  console.log(location,"location on login form")
+  const location = useLocation();
 
-  const from = location.state?.from?.pathname || "/"
+  const from = location.state?.from?.pathname || "/";
 
-  console.log(location?.state?.from?.pathname)
+  console.log(location?.state?.from?.pathname);
 
-  console.log(from,"Location on redirection path")
-
-
-  const handleGoogleAuth = async() => {
+  const handleGoogleAuth = async () => {
     try {
-      const result = await signInWithPopup(auth, provider)
-      const user = result.user
-      console.log(user,"user")
-      const idToken = await user.getIdToken()
-      console.log(idToken,"ID TOKEN FROM google auth")
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      console.log(user, "user");
+      const idToken = await user.getIdToken();
+      console.log(idToken, "ID TOKEN FROM google auth");
 
-
-      const res = await googleAuth({idToken}).unwrap()
-      console.log(res,"Response from api")
+      const res = await googleAuth({ idToken }).unwrap();
+      console.log(res, "Response from api");
       const data = {
         user: res._id,
         role: res.role,
-        accessToken: res.accessToken
-      }
-      console.log(data,"data to redux an issue found")
-      dispatch(setUserCredentials(data))
-      navigate('/',{replace:true})
+        accessToken: res.accessToken,
+      };
+      console.log(data, "data to redux an issue found");
+      dispatch(setUserCredentials(data));
+      navigate("/", { replace: true });
     } catch (error) {
-      // Handle Errors here.
-      console.error('Error code:', error.code)
-   
+      console.error("Error code:", error.code);
     }
-  }
+  };
 
-
-  const loginSubmit = async(data) => {
+  const loginSubmit = async (data) => {
     try {
+      const res = await userLogin(data).unwrap();
+      console.log("login Response", res);
+      console.log({ ...res });
+      dispatch(setUserCredentials({ ...res }));
 
-      const res = await userLogin(data).unwrap()
-      console.log("login Response",res)
-      console.log({...res})
-      dispatch(setUserCredentials({...res}))
-     
-      toast.success(res.message)
-      if(res){
-        navigate(from, { replace: true }); 
-      }  
+      toast.success(res.message);
+      if (res) {
+        navigate(from, { replace: true });
+      }
     } catch (error) {
-      console.log("Error in login submission",error)
-      toast.error(error?.data?.message)
+      console.log("Error in login submission", error);
+      toast.error(error?.data?.message);
     }
-
-  }
-
- 
-
-
+  };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
-    <div className=" p-8 rounded-lg  w-96">
-      <h2 className="mb-6 text-left font-primary text-2xl font-bold  text-gray-900">Login</h2>
+      <div className=" p-8 rounded-lg  w-96">
+        <h2 className="mb-6 text-left font-primary text-2xl font-bold  text-gray-900">
+          Login
+        </h2>
 
-      <form onSubmit={handleSubmit(loginSubmit)}>
-        <div className="mb-4">
-          <Label
-            htmlFor="email"
-            className="block text-sm font-primary font-medium text-gray-700"
-          >
-            Enter your email
-          </Label>
-          <Input
-            type="email"
-            {...register("email")}
-            id="email"
-            className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
-          />
-          <div className="min-h-[10px]">
-            {errors.email && (
-              <span className="text-red-500 text-sm">
-                {errors.email.message}
-              </span>
-            )}
+        <form onSubmit={handleSubmit(loginSubmit)}>
+          <div className="mb-4">
+            <Label
+              htmlFor="email"
+              className="block text-sm font-primary font-medium text-gray-700"
+            >
+              Enter your email
+            </Label>
+            <Input
+              type="email"
+              {...register("email")}
+              id="email"
+              className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+            />
+            <div className="min-h-[10px]">
+              {errors.email && (
+                <span className="text-red-500 text-sm">
+                  {errors.email.message}
+                </span>
+              )}
+            </div>
           </div>
-        </div>
 
-        <div className="mb-6">
-          <Label
-            htmlFor="password"
-            className="block text-sm font-primary font-medium text-gray-700"
-          >
-            Enter your password
-          </Label>
-          <Input
-            type="password"
-            {...register("password")}
-            id="password"
-            className="mt-1 block w-full p-2 font-primary border border-gray-300 rounded-md"
-          />
-          <div className="min-h-[10px]">
-            {errors.password && (
-              <span className="text-red-500 text-sm">
-                {errors.password.message}
-              </span>
-            )}
+          <div className="mb-6">
+            <Label
+              htmlFor="password"
+              className="block text-sm font-primary font-medium text-gray-700"
+            >
+              Enter your password
+            </Label>
+            <Input
+              type="password"
+              {...register("password")}
+              id="password"
+              className="mt-1 block w-full p-2 font-primary border border-gray-300 rounded-md"
+            />
+            <div className="min-h-[10px]">
+              {errors.password && (
+                <span className="text-red-500 text-sm">
+                  {errors.password.message}
+                </span>
+              )}
+            </div>
           </div>
-        </div>
 
-        <Button
-          type="submit"
-          disabled={isLoading}
-          className="w-full bg-black font-primary text-white p-2 rounded-md mb-4"
-        >
-      
-        {isLoading ? 'Logging in...' : 'Login'}
-        </Button>
-      </form>
-      <div className="pt-2 pb-4">
           <Button
-          onClick = {handleGoogleAuth}
+            type="submit"
+            disabled={isLoading}
+            className="w-full bg-black font-primary text-white p-2 rounded-md mb-4"
+          >
+            {isLoading ? "Logging in..." : "Login"}
+          </Button>
+        </form>
+        <div className="pt-2 pb-4">
+          <Button
+            onClick={handleGoogleAuth}
             type="button"
             className=" font-primary  group relative w-full flex justify-center py-2 px-4 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
           >
@@ -173,12 +148,20 @@ const LoginForm = () => {
             Sign up with Google
           </Button>
         </div>
-
- 
+        <div className="text-center mt-4">
+          <p className="text-sm text-gray-600">
+            Don&apos;t have an account?{" "}
+            <Link
+              to="/auth/signup"
+              className="text-black  font-primary  hover:text-indigo-500 font-medium"
+            >
+              Sign up here
+            </Link>
+          </p>
+        </div>
+      </div>
     </div>
-  </div>
-    
-  )
-}
+  );
+};
 
-export default LoginForm
+export default LoginForm;

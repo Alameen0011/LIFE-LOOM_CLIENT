@@ -1,21 +1,38 @@
 import { useFetchUsersQuery, useUpdateUserstatusMutation } from "@/app/service/adminApiSlice";
 import Modal from "@/components/admin/managementModal";
 import { Input } from "@/components/ui/input";
+import Pagination from "@/components/users/Pagination";
 import {  Search } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { useSelector ,useDispatch} from "react-redux";
+import { userlogout } from "@/app/slices/authSlice";
 
 const UserManagement = () => {
 
   const [showModal, setShowModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null); 
 
+  //-------------------------------------pagination----------//
+  const itemsPerPage = 5
+  const [totalPages, setTotalPages] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  
 
   
-  const { data: Allusers, isLoading } = useFetchUsersQuery();
+  //--------------------------------------------------------------//
+
+  
+  const { data: Allusers, isLoading } = useFetchUsersQuery({page:currentPage,limit:itemsPerPage});
   const [updateStatus] = useUpdateUserstatusMutation()
 
   console.log(Allusers)
+
+  const dispatch = useDispatch()
+
+
 
   // Function to handle blocking the user via the modal
   const handleBlockUser = (user) => {
@@ -42,6 +59,8 @@ const UserManagement = () => {
       console.log('User blocked:', selectedUser._id);
      const res = await updateStatus(selectedUser._id).unwrap()
      console.log(res,"response from api block")
+    //  dispatch(userlogout())
+
      toast.error("user blocked")
 
 
@@ -49,6 +68,13 @@ const UserManagement = () => {
       setShowModal(false);  // Close the modal
     }
   };
+
+  useEffect(() => {
+
+    setCurrentPage(Allusers?.page)
+    setTotalPages(Allusers?.totalPages)
+
+  },[Allusers])
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -70,15 +96,15 @@ const UserManagement = () => {
     <table className="max-w-6xl mx-auto mt-10 table-fixed border-collapse bg-white text-sm text-left text-gray-500">
       <thead className="bg-gray-50 text-xs uppercase font-semibold text-gray-700">
         <tr>
-          <th scope="col" className="px-4 py-3 border-b w-1/3 font-primary">ID</th>
-          <th scope="col" className="px-4 py-3 border-b w-1/3 font-primary">Email</th>
+          <th scope="col" className="pl-14 py-3 border-b w-1/3 font-primary">ID</th>
+          <th scope="col" className="px-4 py-3 border-b w-2/3 font-primary">Email</th>
           <th scope="col" className="px-4 py-3 border-b w-1/3 font-primary">Action</th>
         </tr>
       </thead>
       <tbody className="divide-y divide-gray-200">
-        {Allusers?.users?.map((user) => (
+        {Allusers?.users?.map((user,index) => (
           <tr key={user._id} className="hover:bg-gray-50">
-            <td className="px-4 py-3 border-b truncate font-primary">{user._id}</td>
+            <td className="pl-14 py-3 border-b truncate font-primary">{ index + 1}</td>
             <td className="px-4 py-3 border-b truncate font-primary">{user.email}</td>
             <td className="px-4 py-3 border-b">
               {user.isActive ? (
@@ -101,6 +127,17 @@ const UserManagement = () => {
         ))}
       </tbody>
     </table>
+
+
+          <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages || 0}
+          paginate={paginate}
+          
+          
+          
+          />
+
   </div>
 
   {/* Reusable Modal */}
