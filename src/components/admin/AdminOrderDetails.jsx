@@ -6,6 +6,7 @@ import { useParams } from "react-router-dom";
 import {
   useAdminOrderCancelMutation,
   useFetchSingleOrderQuery,
+  useUpdateOrderIndividualItemStatusMutation,
 } from "@/app/service/adminApiSlice";
 import Modal from "./managementModal";
 import { toast } from "react-toastify";
@@ -21,6 +22,7 @@ const AdminOrderDetails = () => {
 
   const { data } = useFetchSingleOrderQuery(id);
   const [orderCancel] = useAdminOrderCancelMutation();
+  const [itemStatusChange] = useUpdateOrderIndividualItemStatusMutation();
 
   const handleCancelOrderRequest = (orderId, itemId) => {
     console.log(orderId, itemId, "clicked on button for cancel ");
@@ -28,6 +30,25 @@ const AdminOrderDetails = () => {
     setItemId(itemId);
 
     setShowModal(true);
+  };
+
+  const handleItemStatusChange = async (orderId, itemId, status) => {
+    console.log(orderId, itemId, status);
+
+    try {
+      const res = await itemStatusChange({ orderId, itemId, status }).unwrap();
+
+      console.log(
+        res,
+        "------response after changing status of individual item in order  "
+      );
+      if (res.success) {
+        toast.success("status changed successFully");
+      }
+    } catch (error) {
+      console.log(error, "error while changing individual status");
+      toast.error(error.data.message);
+    }
   };
 
   const handleConfirmCancel = async () => {
@@ -59,7 +80,6 @@ const AdminOrderDetails = () => {
         <div className="flex items-center gap-4">
           <span className="text-muted-foreground">Welcome!</span>
           <span className="font-medium">{data?.order?.user?.firstName}</span>
-         
         </div>
         <h1 className="text-2xl font-bold font-primary">Order Details</h1>
       </div>
@@ -67,10 +87,7 @@ const AdminOrderDetails = () => {
       <div className="flex justify-between items-center bg-muted/50  rounded-lg">
         <div className="space-y-1">
           <p className="text-sm text-muted-foreground">
-           orderId: {data?.order?._id}
-          </p>
-          <p className="text-sm text-muted-foreground">
-            Delivery By December, 2024
+            orderId: {data?.order?._id}
           </p>
         </div>
         {/* <Button variant="outline" className="gap-2">
@@ -82,7 +99,9 @@ const AdminOrderDetails = () => {
       <div className="grid md:grid-cols-3 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg font-primary">Shipping Address</CardTitle>
+            <CardTitle className="text-lg font-primary">
+              Shipping Address
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
             <p className="font-medium">{data?.order?.user?.firstName}</p>
@@ -98,16 +117,14 @@ const AdminOrderDetails = () => {
             <p className="text-sm text-muted-foreground">
               {data?.order?.shippingDetails?.city}
             </p>
-
-            <p className="text-sm text-muted-foreground">
-              Contact: +1 (555) 123-4567
-            </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg font-primary">Payment Method</CardTitle>
+            <CardTitle className="text-lg font-primary">
+              Payment Method
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
             <div className="flex items-center gap-2">
@@ -122,21 +139,25 @@ const AdminOrderDetails = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg font-primary">Order Summary</CardTitle>
+            <CardTitle className="text-lg font-primary">
+              Order Summary
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
             <div className="flex justify-between">
               <span className="text-muted-foreground">Items Total</span>
-              <span>{data?.order?.totalAmount}</span>
+              <span>₹{data?.order?.totalAmount}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Discount</span>
-              <span className="text-green-600">0.00</span>
+              <span className="text-muted-foreground">saved Amount</span>
+              <span className="text-green-600">
+                ₹{data?.order?.savedAmount}
+              </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Shipping</span>
-              <span>₹0.00</span>
-            </div>
+              <span className="text-muted-foreground">Items price</span>
+              <span>₹{data?.order?.actualAmount}</span>
+            </div>  
             {/* <Separator className="my-2" /> */}
             <div className="flex justify-between font-medium">
               <span>Total</span>
@@ -176,17 +197,36 @@ const AdminOrderDetails = () => {
                     <p className="text-sm text-muted-foreground">
                       Size: {item?.size}
                     </p>
+
+                    {/* Dropdown for status change */}
+                    <select
+                      onChange={(e) =>
+                        handleItemStatusChange(
+                          data?.order?._id,
+                          item?._id,
+                          e.target.value
+                        )
+                      }
+                      value={item?.status}
+                      className="border rounded-md px-2 py-1 text-sm mt-2 focus:ring-2 focus:ring-primary focus:outline-none"
+                    >
+                      <option value="Processing">Processing</option>
+                      <option value="Shipped">Shipped</option>
+                      <option value="Delivered">Delivered</option>
+                      <option value="Cancelled">Cancelled</option>
+                    </select>
                   </div>
                   <div className="text-right">
                     <p className="font-medium">₹{item?.price}</p>
-                    <p className="text-sm text-green-600">15% off</p>
+                    {/* <p className="text-sm text-green-600">15% off</p> */}
                   </div>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-foreground">
                     Status: {item?.status}
                   </span>
-                  {item.status !== "Cancelled"  ? (
+                  {item.status !== "Cancelled" &&
+                  item.status !== "Delivered" ? (
                     <Button
                       onClick={() =>
                         handleCancelOrderRequest(data?.order?._id, item?._id)
@@ -198,7 +238,7 @@ const AdminOrderDetails = () => {
                     </Button>
                   ) : (
                     <Button variant="destructive" size="sm">
-                      Cancelled !
+                      {item.status}!
                     </Button>
                   )}
                 </div>

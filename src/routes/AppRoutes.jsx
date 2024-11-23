@@ -34,6 +34,17 @@ import Order from "@/pages/adminPages/Order";
 import AuthWrapper from "./ProtectedRoutes/AuthWrapper";
 import OrderDetails from "@/components/users/order/OrderDetails";
 import AdminOrderDetails from "@/components/admin/AdminOrderDetails";
+import Offer from "@/pages/adminPages/Offer";
+import AddOffer from "@/pages/adminPages/AddOffer";
+import Coupon from "@/pages/adminPages/Coupon";
+import AddCoupon from "@/components/admin/AddCoupon";
+
+import MyWallet from "@/components/users/Profile/MyWallet";
+import RequireAdminAuth from "./ProtectedRoutes/RequireAdminAuth";
+import MyCoupon from "@/pages/UserPages/MyCoupon";
+import ForgotOtp from "@/pages/ForgotOtp";
+import ResetPasswordPage from "@/pages/ResetPasswordPage";
+import SalesReport from "@/components/admin/SalesReport";
 
 const router = createBrowserRouter([
   {
@@ -54,9 +65,7 @@ const router = createBrowserRouter([
       {
         path: "/wishlist",
         element: <RequireUserAuth />, // Protected route
-        children: [
-          { path: "", element: <WhishlistPage /> },
-        ],
+        children: [{ path: "", element: <WhishlistPage /> }],
       },
       {
         path: "/profile",
@@ -64,12 +73,14 @@ const router = createBrowserRouter([
         children: [
           { path: "orders", element: <MyOrder /> },
           { path: "myProfile", element: <MyProfile /> },
-          { path: "order/:id", element: <OrderDetails /> }, 
-          { path: "myAddress", element: <MyAddress /> }, 
+          { path: "order/:id", element: <OrderDetails /> },
+          { path: "myAddress", element: <MyAddress /> },
           { path: "addAddress", element: <MyNewAddress /> },
           { path: "myResetPassword", element: <MyResetPassword /> },
-          { path: "editProfile/:id", element: <MyEditAddress /> }, 
-          // Child route
+          { path: "editProfile/:id", element: <MyEditAddress /> },
+
+          { path: "wallet", element: <MyWallet /> },
+          { path: "coupons", element: <MyCoupon /> },
         ],
       },
       {
@@ -93,6 +104,8 @@ const router = createBrowserRouter([
           { path: "login", element: <LoginPage /> },
           { path: "signup", element: <SignupPage /> },
           { path: "sendotp", element: <OtpPage /> },
+          { path: "forgotOtp", element: <ForgotOtp /> },
+          { path: "updatePassword", element: <ResetPasswordPage /> },
         ],
       },
     ],
@@ -127,11 +140,12 @@ const router = createBrowserRouter([
   },
   {
     path: "admin",
-    element: <AdminLayout />,
+    element: <RequireAdminAuth />,
 
     errorElement: <ErrorPage />,
     children: [
       {
+        element: <AdminLayout />,
         children: [
           { path: "dashboard", element: <Dashboard /> },
           { path: "customers", element: <UserManagement /> },
@@ -141,7 +155,12 @@ const router = createBrowserRouter([
           { path: "categories", element: <AddCategory /> },
           { path: "addCategory", element: <CategoryForm /> },
           { path: "orders", element: <Order /> },
+          { path: "offers", element: <Offer /> },
+          { path: "addOffer", element: <AddOffer /> },
           { path: "orderDetails/:id", element: <AdminOrderDetails /> },
+          { path: "coupons", element: <Coupon /> },
+          { path: "addCoupon", element: <AddCoupon /> },
+          { path: "sales", element: <SalesReport /> },
         ],
       },
     ],

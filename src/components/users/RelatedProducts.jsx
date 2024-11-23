@@ -14,7 +14,7 @@ const RelatedProducts = ({ relatedProducts }) => {
           {relatedProducts?.map((product) => (
             <Link
               key={product._id}
-              to={`/product/${product._id}`}
+              onClick={`/products/${product._id}`}
               className="group"
             >
               <div className="bg-white rounded-lg shadow-md overflow-hidden transition-transform duration-300 group-hover:shadow-lg group-hover:-translate-y-1">

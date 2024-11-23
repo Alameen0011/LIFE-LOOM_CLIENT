@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,13 +12,18 @@ import { useDispatch } from "react-redux";
 import { signInWithPopup } from "firebase/auth";
 import { auth, provider } from "@/config/firebase";
 import {
+  useFogotPasswordMutation,
   useGoogleAuthMutation,
   useUserLoginMutation,
 } from "@/app/service/authApiSlice";
 import { setUserCredentials } from "@/app/slices/authSlice";
 import { loginSchema } from "@/validationSchemas/Login";
+import { forgotPasswordSchema } from "@/validationSchemas/forgotEmail";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
+
 
 const LoginForm = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false)
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -27,8 +33,17 @@ const LoginForm = () => {
     formState: { errors },
   } = useForm({ resolver: zodResolver(loginSchema) });
 
+  const {
+    register: registerForgotPassword,
+    handleSubmit: handleSubmitForgotPassword,
+    formState: { errors: forgotPasswordErrors },
+  } = useForm({
+    resolver: zodResolver(forgotPasswordSchema),
+  })
+
   const [userLogin, { isLoading }] = useUserLoginMutation();
   const [googleAuth] = useGoogleAuthMutation();
+  const [forgotPassword,{isLoading:forgotPassLoading}] = useFogotPasswordMutation()
 
   const location = useLocation();
 
@@ -75,6 +90,26 @@ const LoginForm = () => {
       toast.error(error?.data?.message);
     }
   };
+
+  const handleForgotPassword = async(data) => {
+
+    try {
+      const res = await forgotPassword(data).unwrap()
+      if(res.success){
+        toast.success("An otp has been sent to your email")
+        navigate("/auth/forgotOtp")
+      }
+
+
+
+
+      
+    } catch (error) {
+      console.log(error,"error while requessting otp for new pass")
+      toast.error(error.data.message)
+    }
+
+  }
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -125,6 +160,40 @@ const LoginForm = () => {
                   {errors.password.message}
                 </span>
               )}
+            </div>
+            <div className="mt-2 text-right">
+            <Dialog open={isModalOpen} onOpenChange={setIsModalOpen} className="font-primary">
+              <DialogTrigger asChild>
+                <Button variant="solid" className="p-0 h-auto font-normal no-underline">
+                  Forgot Password?
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle className="font-primary">Reset Password</DialogTitle>
+                  <DialogDescription className=" font-primary">
+                    Enter your email address and we&apos;ll send you a link to reset your password.
+                  </DialogDescription>
+                </DialogHeader>
+                <form onSubmit={handleSubmitForgotPassword(handleForgotPassword)} className="space-y-4">
+                  <div>
+                    {/* <Label htmlFor="reset-email" className="font-primary">Email</Label> */}
+                    <Input
+                      id="reset-email"
+                      type="email"
+                      {...registerForgotPassword('email')}
+                      placeholder="Enter your email"
+                    />
+                    {forgotPasswordErrors.email && (
+                      <p className="text-sm text-red-500 mt-1 font-primary">{forgotPasswordErrors.email.message}</p>
+                    )}
+                  </div>
+                  <Button disabled={forgotPassLoading} type="submit" className="w-40 bg:black ">
+                   {forgotPassLoading ? "sending..." : "send"}
+                  </Button>
+                </form>
+              </DialogContent>
+            </Dialog>
             </div>
           </div>
 

@@ -65,7 +65,7 @@ const ProductList = () => {
   }, [data]);
 
   return (
-    <div className="container max-w-3xl mx-auto py-10">
+    <div className="container max-w-3xl mx-auto py-10 font-primary">
       <h1 className="text-2xl font-bold mb-6">Product Listing</h1>
       <div className="flex justify-between items-center mb-6">
         <div className="relative w-64">
@@ -80,18 +80,18 @@ const ProductList = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[100px]">Image</TableHead>
-              <TableHead>Name</TableHead>
-              <TableHead>Category</TableHead>
-              <TableHead>Price</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead className="w-[100px] font-bold">Image</TableHead>
+              <TableHead className="font-bold">Name</TableHead>
+              <TableHead className="font-bold">Category</TableHead>
+              <TableHead className="font-bold">Price</TableHead>
+              <TableHead className="font-bold">Status</TableHead>
+              <TableHead className="text-center font-bold">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {data?.products?.map((product) => (
               <TableRow key={product._id}>
-                <TableCell>
+                <TableCell >
                   <img
                     src={product.images[1]}
                     alt={product.productName}
@@ -101,7 +101,7 @@ const ProductList = () => {
                   />
                 </TableCell>
                 <TableCell className="font-medium">
-                  {product.productName}
+                  {product.productName} 
                 </TableCell>
                 <TableCell>{product?.category?.categoryName}</TableCell>
                 <TableCell>₹{product.price.toFixed(2)}</TableCell>

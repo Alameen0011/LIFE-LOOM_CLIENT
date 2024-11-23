@@ -55,7 +55,7 @@ const Address = () => {
           <div className="rounded-full bg-primary/10 p-4">
             <MapPin className="h-6 w-6 text-primary" />
           </div>
-          <Button onClick={handleAddAddress} variant="outline" className="w-full">
+          <Button onClick={handleAddAddress} variant="outline" className="w-full font-primary font-semibold">
             Add New Address
           </Button>
         </CardContent>
@@ -63,7 +63,7 @@ const Address = () => {
 
       {addressData?.addresses?.map((address) => (
         <Card key={address._id} className="transition-shadow hover:shadow-md">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 font-primary">
         
             <CardTitle className="text-sm font-medium">
               {address.addressName || "Address"}
@@ -87,7 +87,7 @@ const Address = () => {
               </Button>
             </div>
           </CardHeader>
-          <CardContent className="pt-2">
+          <CardContent className="pt-2 font-primary">
             <div className="grid gap-2">
               <div className="font-medium">{address?.state}</div>
               <div className="text-sm text-muted-foreground">

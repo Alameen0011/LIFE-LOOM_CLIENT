@@ -26,13 +26,19 @@ import { getCroppedImg } from "@/utils/getCroppedImg";
 import SpinnerOverlay from "../SpinnerOvarlay";
 
 const EditProductForm = () => {
-    
   const { productId } = useParams();
-  const { data,isLoading: productloading,isError: productError,refetch,isFetching} = useFetchSingleProductQuery(productId);
-  const { data: categoryData } = useFetchCategoriesQuery({page:1,limit:4});
+  const {
+    data,
+    isLoading: isProductLoading,
+    isError: productError,
+    refetch: refetchProductDetails,
+    isFetching,
+  } = useFetchSingleProductQuery(productId);
+  const { data: categoryData, isLoading: isCategoryLoading } =
+    useFetchCategoriesQuery({ page: 1, limit: 4 });
   const [categories, setCategories] = useState([]);
   const [selectedImageIndex, setSelectedImageIndex] = useState(null);
-  const [loading , setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
   const [image, setImage] = useState(null);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
@@ -51,88 +57,89 @@ const EditProductForm = () => {
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
 
-
-  const [updateProducts,{isLoading:UpdationLoading}] = useUpdateProductMutation();
+  const [updateProducts, { isLoading: UpdationLoading }] =
+    useUpdateProductMutation();
 
   useEffect(() => {
-    if (data) {
-      console.log(data?.product, "data from fetching the API in useEffect");
-      const productData = data?.product;
-      console.log(productData, "product data --  ");
-      console.log("useEffect called");
-  
+    // if (!productloading) {
+    // console.log(data?.product, "data from fetching the API in useEffect");
+    const productData = data?.product;
+    // console.log(productData, "product data --  ");
+    // console.log("useEffect called");
+    if (!isProductLoading) {
       setProduct({
-        name: productData?.productName || "",
-        description: productData?.description || "",
-        price: productData?.price ? productData.price.toString() : "",
-        category: productData?.category._id || "",
-        gender: productData?.gender || "",
-        brand: productData?.brand || "",
-        sku: productData?.sku || "",
+        name: productData?.productName,
+        description: productData?.description,
+        price: productData?.price.toString(),
+        category: productData?.category._id,
+        gender: productData?.gender,
+        brand: productData?.brand,
+        sku: productData?.sku,
         sizes: productData?.sizes
-          ? productData.sizes.reduce((acc, size) => {
-              acc[size.size] = size.stock.toString();
-              return acc;
-            }, { S: "", M: "", L: "", XL: "" })
+          ? productData.sizes.reduce(
+              (acc, size) => {
+                acc[size.size] = size.stock.toString();
+                return acc;
+              },
+              { S: "", M: "", L: "", XL: "" }
+            )
           : { S: "", M: "", L: "", XL: "" }, // Fallback default if sizes is undefined
-        images: productData?.images || Array(4).fill(""),
+        images: productData?.images,
       });
     }
-  }, [data, productId]);
-  
-  const refetchData = () => {
-    refetch();
-    console.log("refetch data triggered");
-  };
-  
-  useEffect(() => {
-    console.log("product id changed");
-  
-    // Check if the refetch operation is in progress
-    if (productId && !isFetching) {
-      refetchData();
-      console.log("refetch data called");
-    }
-  }, [productId]);
-  
-  // If the API is fetching, you might want to prevent setting the state too early
-  useEffect(() => {
-    if (!isFetching && data) {
-      const productData = data?.product;
-      setProduct({
-        name: productData?.productName || "",
-        description: productData?.description || "",
-        price: productData?.price ? productData.price.toString() : "",
-        category: productData?.category._id || "",
-        gender: productData?.gender || "",
-        brand: productData?.brand || "",
-        sku: productData?.sku || "",
-        sizes: productData?.sizes
-          ? productData.sizes.reduce((acc, size) => {
-              acc[size.size] = size.stock.toString();
-              return acc;
-            }, { S: "", M: "", L: "", XL: "" })
-          : { S: "", M: "", L: "", XL: "" }, // Fallback default if sizes is undefined
-        images: productData?.images || Array(4).fill(""),
-      });
-    }
-  }, [data, isFetching]);
+    // }
+  }, [data?.product, isProductLoading]);
 
   useEffect(() => {
-    if (categoryData) {
-        console.log(categoryData,"category data --  ")
-      setCategories(categoryData.categories);
-    }
-  }, [categoryData]);
+    refetchProductDetails();
+  }, [refetchProductDetails]);
 
-  useEffect(() => {
-    console.log(product,"--product state")
-  },[product])
+  // const refetchData = () => {
+  //   refetch();
+  //   console.log("refetch data triggered");
+  // };
 
+  // useEffect(() => {
+  //   console.log("product id changed");
 
+  //   if (productId && !isFetching) {
+  //     refetchData();
+  //     console.log("refetch data called");
+  //   }
+  // }, [productId]);
 
-    
+  // useEffect(() => {
+  //   if (!isFetching && data) {
+  //     const productData = data?.product;
+  //     setProduct({
+  //       name: productData?.productName || "",
+  //       description: productData?.description || "",
+  //       price: productData?.price ? productData.price.toString() : "",
+  //       category: productData?.category._id || "",
+  //       gender: productData?.gender || "",
+  //       brand: productData?.brand || "",
+  //       sku: productData?.sku || "",
+  //       sizes: productData?.sizes
+  //         ? productData.sizes.reduce((acc, size) => {
+  //             acc[size.size] = size.stock.toString();
+  //             return acc;
+  //           }, { S: "", M: "", L: "", XL: "" })
+  //         : { S: "", M: "", L: "", XL: "" }, // Fallback default if sizes is undefined
+  //       images: productData?.images || Array(4).fill(""),
+  //     });
+  //   }
+  // }, [data, isFetching]);
 
+  // useEffect(() => {
+  //   if (categoryData) {
+  //       console.log(categoryData,"category data --  ")
+  //     setCategories(categoryData.categories);
+  //   }
+  // }, [categoryData]);
+
+  // useEffect(() => {
+  //   console.log(product,"--product state")
+  // },[product])
 
   const validateFieldValues = (name, value) => {
     let error = "";
@@ -148,8 +155,13 @@ const EditProductForm = () => {
       case "description":
         if (!value.trim()) {
           error = "Description is required";
-        } else if (!/^[a-zA-Z0-9\s!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?&]*$/.test(value.trim())) {
-          error = "Description should only contain letters, numbers, and specific punctuation.";
+        } else if (
+          !/^[a-zA-Z0-9\s!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?&]*$/.test(
+            value.trim()
+          )
+        ) {
+          error =
+            "Description should only contain letters, numbers, and specific punctuation.";
         }
         break;
 
@@ -185,13 +197,12 @@ const EditProductForm = () => {
         }
         break;
 
-
-    case "images":
-      // Check if there are at least 3 images uploaded
-      if (!product.images || product.images.length < 3) {
-        error = "At least 3 images are required";
-      }
-      break;
+      case "images":
+        // Check if there are at least 3 images uploaded
+        if (!product.images || product.images.length < 3) {
+          error = "At least 3 images are required";
+        }
+        break;
 
       default:
         // Validate sizes (for stock of each size)
@@ -202,31 +213,31 @@ const EditProductForm = () => {
         }
     }
     return error;
-};
+  };
 
-    const handleChange = (e) => {
-      const { name, value } = e.target;
-    
-      const error = validateFieldValues(name, value);
-      setErrors((prev) => ({ ...prev, [name]: error }));
-      setProduct((prev) => ({
-        ...prev,
-        [name]: name === "price" ? value : value,
-      }));
-    };
+  const handleChange = (e) => {
+    const { name, value } = e.target;
 
-    const handleSizeChange = (size, value) => {
-      const trimmedValue = value.trim();
-      const error = validateFieldValues(`sizes.${size}`, trimmedValue);
-      setErrors((prev) => ({ ...prev, [`sizes.${size}`]: error }));
-      setProduct((prev) => ({
-        ...prev,
-        sizes: {
-          ...prev.sizes,
-          [size]: trimmedValue,
-        },
-      }));
-    };
+    const error = validateFieldValues(name, value);
+    setErrors((prev) => ({ ...prev, [name]: error }));
+    setProduct((prev) => ({
+      ...prev,
+      [name]: name === "price" ? value : value,
+    }));
+  };
+
+  const handleSizeChange = (size, value) => {
+    const trimmedValue = value.trim();
+    const error = validateFieldValues(`sizes.${size}`, trimmedValue);
+    setErrors((prev) => ({ ...prev, [`sizes.${size}`]: error }));
+    setProduct((prev) => ({
+      ...prev,
+      sizes: {
+        ...prev.sizes,
+        [size]: trimmedValue,
+      },
+    }));
+  };
 
   const handleImageChange = (index, event) => {
     const file = event.target.files[0];
@@ -287,7 +298,7 @@ const EditProductForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true)
+  
 
     // Validate all fields
     const newErrors = {};
@@ -308,6 +319,8 @@ const EditProductForm = () => {
       return;
     }
 
+    setLoading(true);
+
     const { name, description, price, category, brand, gender, sku, sizes } =
       product;
 
@@ -324,8 +337,8 @@ const EditProductForm = () => {
       return;
     }
 
-    console.log(category,"category frontend")
-     
+    console.log(category, "category frontend");
+
     const updateProduct = {
       name,
       description,
@@ -341,28 +354,30 @@ const EditProductForm = () => {
     //call to put product to db
 
     try {
-      const res = await updateProducts({productId: productId,body: updateProduct});
+      const res = await updateProducts({
+        productId: productId,
+        body: updateProduct,
+      });
       console.log(res);
-  
-      console.log("cart fetched after updation of product")
-    
+
+      console.log("cart fetched after updation of product");
+
       if (res) {
         toast.success("product updated successfully");
         navigate("/admin/products");
-      } 
+      }
     } catch (error) {
       console.log(error);
       toast.error("error in uploading product");
-    }finally{
-      setLoading(false)
+    } finally {
+      setLoading(false);
     }
   };
 
   if (!product) {
-    console.log(product,"product inside  heyyy")
+    console.log(product, "product inside  heyyy");
     return <div>Loading...</div>;
   }
-  
 
   return (
     <div className="flex bg-gray-100 min-h-screen">
@@ -372,7 +387,7 @@ const EditProductForm = () => {
           <p className="text-gray-500">Dashboard &gt; product &gt; add</p>
         </div>
 
-        <form onSubmit={handleSubmit}  className="space-y-8">
+        <form onSubmit={handleSubmit} className="space-y-8">
           <Card>
             <CardContent className="p-6">
               <div className="grid gap-6">
@@ -381,7 +396,7 @@ const EditProductForm = () => {
                     placeholder="Enter product Name"
                     label="Product Name"
                     name="name"
-                    value={product.name || ""}
+                    value={product.name}
                     onChange={handleChange}
                     error={errors.name} // Pass the error to the Input if your component supports it
                     max={20}
@@ -397,7 +412,7 @@ const EditProductForm = () => {
                     placeholder="Enter description"
                     label="Description"
                     name="description"
-                    value={product.description || ""}
+                    value={product.description}
                     onChange={handleChange}
                     error={errors.description}
                   />
@@ -412,7 +427,7 @@ const EditProductForm = () => {
                     placeholder="₹ 3000"
                     label="Price"
                     name="price"
-                    value={product.price || ""}
+                    value={product.price}
                     onChange={handleChange}
                     error={errors.price}
                     type="number"
@@ -445,15 +460,16 @@ const EditProductForm = () => {
                       }
                       value={product.category}
                     >
-                      <SelectTrigger> 
+                      <SelectTrigger>
                         <SelectValue placeholder="Select category" />
                       </SelectTrigger>
                       <SelectContent>
-                        {categories?.map((category) => (
-                          <SelectItem key={category._id} value={category._id}>
-                            {category.categoryName}
-                          </SelectItem>
-                        ))}
+                        {!isCategoryLoading &&
+                          categoryData.categories.map((category) => (
+                            <SelectItem key={category._id} value={category._id}>
+                              {category.categoryName}
+                            </SelectItem>
+                          ))}
                       </SelectContent>
                     </Select>
                     {errors.category && (
@@ -468,10 +484,10 @@ const EditProductForm = () => {
                       onValueChange={(value) =>
                         setProduct({ ...product, gender: value })
                       }
-                      value={product.gender} 
+                      value={product.gender}
                     >
                       <SelectTrigger>
-                      <SelectValue placeholder="Select a Gender" />
+                        <SelectValue placeholder="Select a Gender" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="Male">Male</SelectItem>
@@ -488,8 +504,8 @@ const EditProductForm = () => {
                       onValueChange={(value) =>
                         setProduct({ ...product, brand: value })
                       }
-                      // value={product.brand} 
-                    > 
+                      value={product.brand}
+                    >
                       <SelectTrigger>
                         <SelectValue placeholder="Select Brand" />
                       </SelectTrigger>
@@ -588,16 +604,18 @@ const EditProductForm = () => {
                   ))}
                 </div>
 
-                <Button type="submit" className="w-full" disabled={UpdationLoading}>
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={UpdationLoading}
+                >
                   {UpdationLoading ? "updating..." : "Edit product"}
                 </Button>
               </div>
             </CardContent>
           </Card>
         </form>
-        {
-          loading && <SpinnerOverlay message="editing product" color="green" />
-        }
+        {loading && <SpinnerOverlay message="editing product" color="green" />}
 
         {image && (
           <div className="fixed pt-10 inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">

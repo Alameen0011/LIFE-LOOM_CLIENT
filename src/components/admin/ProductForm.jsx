@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Label } from "../ui/label";
 import { Button } from "../ui/button";
 import { Save, Upload, X } from "lucide-react";
@@ -46,8 +46,15 @@ const ProductForm = () => {
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
 
-  const { data, isLoading } = useFetchCategoriesQuery();
+  const { data, isLoading } = useFetchCategoriesQuery({page:1,limit:4});
   const [addProduct ,{isLoading:addProductLoading}] = useAddProductMutation();
+
+
+  useEffect(() => {
+    if(data){
+      console.log(data,"data form category fetch")
+    }
+  },[data])
 
   console.log(data);
 

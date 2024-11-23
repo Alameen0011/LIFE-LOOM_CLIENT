@@ -41,12 +41,7 @@ const SideBar = () => {
               Delivery address
             </Link>
           </Button>
-          <Button variant="ghost" className="justify-start  font-primary font-semibold  gap-2" asChild>
-          <Link to="/profile/myWhishList">
-              <Heart className="h-4 w-4" />
-              my wishList
-            </Link>
-          </Button>
+       
           <Button variant="ghost" className="justify-start  font-primary font-semibold  gap-2" asChild>
           <Link to="/profile/myResetPassword">
               <User className="h-4 w-4" />
@@ -54,13 +49,13 @@ const SideBar = () => {
             </Link>
           </Button>
           <Button variant="ghost" className="justify-start  font-primary font-semibold  gap-2" asChild>
-            <Link href="#">
+            <Link to="/profile/wallet">
               <Wallet className="h-4 w-4" />
               wallet
             </Link>
           </Button>
           <Button variant="ghost" className="justify-start  font-primary font-semibold  gap-2" asChild>
-            <Link href="#">
+            <Link to="/profile/coupons">
               <Ticket className="h-4 w-4" />
               Coupons
             </Link>

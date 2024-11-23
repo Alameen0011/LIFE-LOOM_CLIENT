@@ -54,9 +54,10 @@ const CategoryList = () => {
 
   };
 
-  const handleModalClose = () => {
+  const handleModalClose = (reset) => {
     setModalOpen(false);
     setSelectedCategory(null);
+    reset()
   };
 
   const handleDelete = (category) => {

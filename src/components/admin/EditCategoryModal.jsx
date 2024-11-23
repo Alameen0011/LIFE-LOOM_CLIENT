@@ -6,6 +6,9 @@ const EditCategoryModal = ({category,isOpen,onClose,onSave}) => {
 
     const {register,handleSubmit,reset, formState: { errors }} = useForm({resolver:zodResolver(addCategorySchema)})
 
+
+    console.log(category,"=====category")
+
     const onSubmit = (data) => {
       console.log({...category,...data},"spreading on submit")
         onSave({ ...category, ...data });
@@ -28,6 +31,7 @@ const EditCategoryModal = ({category,isOpen,onClose,onSave}) => {
           <input
             type="text"
             {...register("categoryName")}
+            defaultValue={category.categoryName}
             className={`mt-1 block w-full px-3 py-2 border ${errors.categoryName ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm font-primary`}
           />
           {errors.categoryName && (
@@ -40,6 +44,7 @@ const EditCategoryModal = ({category,isOpen,onClose,onSave}) => {
           <label className="block text-sm font-medium text-gray-700 font-primary">Description</label>
           <textarea
             {...register("description")}
+            defaultValue={category.description}
             className={`mt-1 block w-full px-3 py-2 border ${errors.description ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm font-primary`}
           />
           {errors.description && (
@@ -51,7 +56,7 @@ const EditCategoryModal = ({category,isOpen,onClose,onSave}) => {
         <div className="flex justify-end space-x-4">
           <button
             type="button"
-            onClick={onClose}
+            onClick={() => onClose(reset)}
             className="bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded font-primary"
           >
             Cancel

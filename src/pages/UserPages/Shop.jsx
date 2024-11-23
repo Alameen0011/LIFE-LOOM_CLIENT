@@ -17,6 +17,7 @@ const Shop = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filters, setFilters] = useState({});
   const [sortBy, setSortBy] = useState("NewArrivals");
+  const [filteredProducts, setFilteredProducts] = useState([]);
 
   const itemsPerPage = 8;
   const [totalPages, setTotalPages] = useState(0);
@@ -58,6 +59,28 @@ const Shop = () => {
     console.log(`Navigate to product details of ID: ${id}`);
     navigate(`/products/${id}`);
   };
+
+  useEffect(() => {
+    if (products) {
+      console.log(products,"==products")
+      const updatedProducts = products.filteredProducts.map((product) => {
+        if (product.offer) {
+          const discount = product.offer.offerPercentage / 100;
+          const discountedPrice =Math.round( product.price - product.price * discount)
+          return {
+            ...product,
+            discountedPrice,
+          };
+        }
+        return product;
+      });
+      console.log(updatedProducts,"=====updatedPRoducts")
+      setFilteredProducts(updatedProducts); // Update the state with discounted prices
+    }
+  }, [products]);
+
+
+  console.log(filteredProducts,"======filitered products")
 
   return (
     <div className="container mx-auto p-6">
@@ -109,7 +132,7 @@ const Shop = () => {
           </div>
 
           <div className="px-2  grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-9 font-primary">
-            {products?.filteredProducts?.map((product) => (
+            {filteredProducts?.map((product) => (
               <Card
                 onClick={() => handleProductDetails(product._id)}
                 key={product._id}
@@ -154,7 +177,16 @@ const Shop = () => {
                   )}
 
                   <p className="text-sm font-bold mt-2 group-hover:text-primary transition-colors duration-300">
-                    ₹{product.price}
+                    {product.discountedPrice ? (
+                      <>
+                        <span className="line-through text-gray-500 mr-2">
+                          ₹{product.price}
+                        </span>{" "}
+                        <span className=""  >₹{product.discountedPrice}</span>
+                      </>
+                    ) : (
+                      `₹${product.price}`
+                    )}
                   </p>
 
                   <p className="text-sm font-bold mt-2 group-hover:text-primary transition-colors duration-300">

@@ -2,31 +2,34 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FileText } from "lucide-react";
 import { useParams } from "react-router-dom";
-import { useGetSingleOrderQuery, useOrderCancelMutation } from "@/app/service/orderApiSlice";
+import {
+  useGetSingleOrderQuery,
+  useOrderCancelMutation,
+} from "@/app/service/orderApiSlice";
 import { useState } from "react";
 import Modal from "@/components/admin/managementModal";
 import { toast } from "react-toastify";
 import { Box, CircularProgress } from "@mui/material";
+import OrderHistoryModal from "../OrderHIstoryModal";
 
 const OrderDetails = () => {
-  const [showModal, setShowModal] = useState(false);
-  const [orderId, setOrderId] = useState(null);
-  const [itemId, setItemId] = useState(null);
+  // const [showModal, setShowModal] = useState(false);
+  // const [orderId, setOrderId] = useState(null);
+  // const [itemId, setItemId] = useState(null);
 
   const [orderCancel] = useOrderCancelMutation();
 
-  const handleCancelOrderRequest = (orderId, itemId) => {
-    console.log(orderId, itemId, "clicked on button for cancel ");
-    setOrderId(orderId);
-    setItemId(itemId);
+  // const handleCancelOrderRequest = (orderId, itemId) => {
+  //   console.log(orderId, itemId, "clicked on button for cancel ");
+  //   setOrderId(orderId);
+  //   setItemId(itemId);
 
-    setShowModal(true);
-  };
+  //   setShowModal(true);
+  // };
 
-  const handleConfirmCancel = async () => {
-    console.log(orderId, itemId, "order id,itemId");
+  const handleConfirmCancel = async (orderId, itemId) => {
     try {
-      const res = await orderCancel({orderId,itemId}).unwrap();
+      const res = await orderCancel({ orderId, itemId }).unwrap();
 
       console.log(res, "response from cancel order");
       if (res.success) {
@@ -40,17 +43,13 @@ const OrderDetails = () => {
     }
   };
 
-
-
-
   const { id } = useParams();
 
   console.log(id, "id from useparams for single order details fetching");
 
-  const { data ,isLoading:singleDataLoading} = useGetSingleOrderQuery(id);
+  const { data, isLoading: singleDataLoading } = useGetSingleOrderQuery(id);
 
   console.log(data, "data from single order fetching");
-
 
   if (singleDataLoading) {
     return (
@@ -68,20 +67,14 @@ const OrderDetails = () => {
     );
   }
 
-
-
-
-
-
   return (
     <div className="container mx-auto max-w-2xl m-10 space-y-6">
       <div className="flex justify-between items-center font-primary">
-      <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4">
           <span className="text-muted-foreground">Welcome!</span>
           <span className="font-medium">{data?.order?.user?.firstName}</span>
         </div>
         <h1 className="text-2xl font-bold">Order Details</h1>
-      
       </div>
 
       <div className="flex justify-between items-center bg-muted/50 p-4 rounded-lg font-primary">
@@ -109,7 +102,7 @@ const OrderDetails = () => {
       <div className="grid md:grid-cols-3 gap-6 font-primary">
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Shipping Address</CardTitle>
+            <CardTitle className="">Shipping Address</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
             <p className="text-sm">{data?.order?.user?.firstName}</p>
@@ -130,7 +123,7 @@ const OrderDetails = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Payment Method</CardTitle>
+            <CardTitle className="">Payment Method</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
             <div className="flex items-center gap-2">
@@ -145,25 +138,29 @@ const OrderDetails = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Order Summary</CardTitle>
+            <CardTitle className="">Order Summary</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Items Total</span>
-              <span>{data?.order?.totalAmount}</span>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground text-sm">Items Total</span>
+              <span>₹{data?.order?.totalAmount}</span>
             </div>
-            <div className="flex justify-between text-sm">
-              <span className=" text-muted-foreground">Discount</span>
-              <span className="text-green-600">₹0.00</span>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground text-sm">
+                saved Amount
+              </span>
+              <span className="text-green-600 text-sm">
+                ₹{data?.order?.savedAmount}
+              </span>
             </div>
-            <div className="flex justify-between text-sm">
-              <span className=" text-muted-foreground">Shipping</span>
-              <span>₹0.00</span>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground text-sm">Items price</span>
+              <span className="text-sm">₹{data?.order?.actualAmount}</span>
             </div>
             {/* <Separator className="my-2" /> */}
             <div className="flex justify-between font-medium">
               <span>Total</span>
-              <span>{data?.order?.totalAmount}</span>
+              <span className="text-sm">{data?.order?.totalAmount}</span>
             </div>
           </CardContent>
         </Card>
@@ -171,7 +168,7 @@ const OrderDetails = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle className="font-primary" >Order Items</CardTitle>
+          <CardTitle className="font-primary">Order Items</CardTitle>
         </CardHeader>
         <CardContent>
           {data?.order?.items?.map((item, index) => (
@@ -190,9 +187,7 @@ const OrderDetails = () => {
               <div className="flex-1 space-y-2">
                 <div className="flex justify-between items-start">
                   <div>
-                    <h3 className="text-sm">
-                      {item?.product?.productName}
-                    </h3>
+                    <h3 className="text-sm">{item?.product?.productName}</h3>
                     <p className="text-xs text-muted-foreground mt-2">
                       Quantity: {item?.quantity}
                     </p>
@@ -209,10 +204,14 @@ const OrderDetails = () => {
                   <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-foreground">
                     Status: {item?.status}
                   </span>
-                  {item.status !== "Cancelled"  ? (
+                  {item.status === "Delivered" ? (
+                    <Button variant="destructive" size="sm">
+                      Delivered!
+                    </Button>
+                  ) : item.status !== "Cancelled" ? (
                     <Button
                       onClick={() =>
-                        handleCancelOrderRequest(data?.order?._id, item?._id)
+                        handleConfirmCancel(data?.order?._id, item?._id)
                       }
                       variant="destructive"
                       size="sm"
@@ -230,15 +229,6 @@ const OrderDetails = () => {
           ))}
         </CardContent>
       </Card>
-
-
-      <Modal
-        title="Are you sure you want to cancel this order?"
-        message="This action cannot be undone."
-        isOpen={showModal}
-        onConfirm={handleConfirmCancel}
-        onClose={() => setShowModal(false)}
-      />
     </div>
   );
 };

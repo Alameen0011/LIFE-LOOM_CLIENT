@@ -1,3 +1,4 @@
+import { method } from "lodash";
 import { apiSlice } from "./apiSlice";
 
 export const authApiSlice = apiSlice.injectEndpoints({
@@ -60,6 +61,33 @@ export const authApiSlice = apiSlice.injectEndpoints({
         body: data,
       }),
     }),
+
+    verifyForgot:builder.mutation({
+      query:(otpData) => ({
+        url:"/user/auth/forgotOtp",
+        method:"POST",
+        body:otpData
+      }),
+    }),
+
+    passwordChange:builder.mutation({
+      query:(Data) => ({
+        url:"/user/auth/passwordChange",
+        method:"POST",
+        body:Data
+      }),
+    }),
+    resendForgotOtp:builder.mutation({
+      query:(data) => ({
+        url:"/user/auth/resendForgotOtp",
+        method:"POST",
+        body:data
+      })
+    })
+
+
+
+
   }),
 });
 
@@ -73,4 +101,7 @@ export const {
   useGetAccessQuery,
   useGoogleAuthMutation,
   useFogotPasswordMutation,
+  useVerifyForgotMutation,
+  usePasswordChangeMutation,
+  useResendForgotOtpMutation
 } = authApiSlice;

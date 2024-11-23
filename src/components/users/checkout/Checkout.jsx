@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+
 import {
   Dialog,
   DialogContent,
@@ -14,6 +15,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { CreditCard, Edit2, Plus, ShoppingCart, Wallet } from "lucide-react";
 import {
   useAddAddressMutation,
+  useApplyCouponMutation,
   useGetAllAddressQuery,
 } from "@/app/service/userApiSlice";
 import { useGetCartQuery } from "@/app/service/cartApiSlice";
@@ -24,6 +26,9 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { addressSchema } from "@/validationSchemas/addAddress";
+import RazorpayOrg from "@/components/payment/Razorpay";
+import { useSelector } from "react-redux";
+import { selectUserName } from "@/app/slices/authSlice";
 
 const Checkout = () => {
   const { data: addressData } = useGetAllAddressQuery();
@@ -32,6 +37,7 @@ const Checkout = () => {
 
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState(null);
+  const [couponData, setCouponData] = useState(null);
 
   const [isNewAddressModalOpen, setIsNewAddressModalOpen] = useState(false);
   const [promoCode, setPromoCode] = useState("");
@@ -45,6 +51,9 @@ const Checkout = () => {
   } = useForm({ resolver: zodResolver(addressSchema) });
 
   const [addAddress, { isLoading, isError }] = useAddAddressMutation();
+  const [applyCoupon] = useApplyCouponMutation();
+
+  const userName = useSelector(selectUserName);
 
   const handleAddNewAddress = async (data) => {
     data.isDefault = Boolean(data.isDefault);
@@ -55,33 +64,48 @@ const Checkout = () => {
       if (res.success) {
         console.log(res, "response from adding address APi");
         toast.success("address added successFully");
-        reset()
-        
-    
+        reset();
       }
     } catch (error) {
       console.log(error);
-    }finally{
-      setIsNewAddressModalOpen(false)
+    } finally {
+      setIsNewAddressModalOpen(false);
     }
   };
 
+  const subTotal =
+    cartItems?.cart?.items?.reduce(
+      (acc, item) => acc + item.price * item.quantity,
+      0
+    ) || 0;
+  const finalTotal = couponData?.finalTotal || 0;
+  const discount = couponData?.discount || 0;
+  const totalAmount = Number(subTotal.toFixed(2));
 
-  const handleApplyPromoCode = () => {
-    console.log("apply promo code");
+  const handleApplyPromoCode = async () => {
+    try {
+      const res = await applyCoupon({ code: promoCode }).unwrap();
+      if (res.success) {
+        setCouponData({
+          discount: res.discount,
+          finalTotal: res.finalTotal,
+          cartTotal: res.cartTotal,
+        });
+        toast.success("Coupon applied successfully");
+      } else {
+        toast.error("Invalid coupon");
+        setCouponData(null);
+      }
+    } catch (error) {
+      toast.error(error?.data?.message || "Error applying coupon");
+      setCouponData(null);
+    }
   };
 
-  const subTotal =
-    cartItems?.cart?.items?.reduce((acc, item) => {
-      return acc + item.price * item.quantity;
-    }, 0) || 0;
-  console.log(subTotal, "subtotal");
-  const shippingCharge = 0;
-  const shipping = subTotal * shippingCharge;
-  const total = shipping + subTotal;
-
-  const handlePlaceOrder = async() => {
+  const handlePlaceOrder = async (paymentStatus = "Pending") => {
     console.log("place order");
+
+    console.log(paymentStatus,"===payment status")
 
     if (!selectedAddress) {
       console.log(selectedAddress);
@@ -116,33 +140,52 @@ const Checkout = () => {
       ),
       paymentDetails: {
         method: paymentMethod,
-        status: "Pending",
+        status: paymentStatus ,
       },
-      totalAmount: Number(total.toFixed(2)),
+
+      totalAmount,
+      finalTotal: finalTotal ? Number(finalTotal.toFixed(2)) : 0,
+      discount,
+      coupon: promoCode,
     };
 
+    console.log(orderData,"====orderDAtea")
+
+
     try {
-      const res =await placeOrder(orderData).unwrap();
+
+
+      const res = await placeOrder(orderData).unwrap();
 
       console.log(res, "response from place order");
-  
+
       if (res.success) {
         navigate("/order/confirmation");
       }
-      
     } catch (error) {
-      console.log(error,"error while placing order")
-      toast.error(error?.data?.message)
-      
+      console.log(error, "error while placing order");
+      toast.error(error?.data?.message);
     }
-
- 
   };
 
+  const handleButtonTextChange = () => {
+    switch (paymentMethod) {
+      case "cod":
+        return "Place order"; 
+      case "wallet":
+        return "Place order";
+      case "razorpay":
+        return "Pay";
+      default:
+        return "Place order";
+    }
+  };
+  
+
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8 font-primary">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-semibold text-gray-900 mb-8">Checkout</h1>
+        <h1 className="text-2xl font-semibold  text-gray-900 mb-8">Checkout</h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Address Selection */}
@@ -183,7 +226,6 @@ const Checkout = () => {
                         </p>
                       </div>
                     </Label>
-                  
                   </div>
                 ))}
               </div>
@@ -338,16 +380,27 @@ const Checkout = () => {
                   {/* Add more products here */}
                   <div className="border-t pt-4">
                     <div className="flex justify-between">
-                      <p className="font-medium">Subtotal</p>
-                      <p className="font-medium">₹{subTotal.toFixed(2)}</p>
+                      <p className="text-sm">Subtotal</p>
+                      <p className="text-md">
+                        ₹
+                        {couponData?.cartTotal.toFixed(2) ||
+                          subTotal.toFixed(2)}
+                      </p>
                     </div>
                     <div className="flex justify-between mt-2">
-                      <p className="font-medium">Shipping</p>
-                      <p className="font-medium">₹{shipping.toFixed(2)}</p>
+                      <p className="text-sm">Discount</p>
+                      <p className="text-md">
+                        {couponData?.discount?.toFixed(2) || 0}
+                      </p>
                     </div>
                     <div className="flex justify-between mt-4 text-lg font-semibold">
                       <p>Total</p>
-                      <p>₹{total.toFixed(2)}</p>
+                      <p>
+                        ₹
+                        {couponData?.finalTotal.toFixed(2)
+                          ? couponData?.finalTotal.toFixed(2)
+                          : subTotal.toFixed(2)}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -359,12 +412,12 @@ const Checkout = () => {
               <CardHeader>
                 <CardTitle>Payment Method</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className={"min-h-[304px]"}>
                 <RadioGroup
                   value={paymentMethod}
                   onValueChange={setPaymentMethod}
                 >
-                  <div className="space-y-4">
+                  <div className="space-y-4 ">
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value="wallet" id="wallet" />
                       <Label
@@ -470,9 +523,22 @@ const Checkout = () => {
                   </div>
                 </div>
 
-                <Button className="w-full mt-6" onClick={handlePlaceOrder}>
-                  <ShoppingCart className="mr-2 h-4 w-4" /> Place Order
-                </Button>
+                {handleButtonTextChange() === "Place order" ? (
+                  <Button
+                    className="w-full mt-6"
+                    disabled={!selectedAddress || !paymentMethod}
+                    onClick={() => handlePlaceOrder()}
+                  >
+                    <ShoppingCart className="mr-2 h-4 w-4" />
+                    {handleButtonTextChange()}
+                  </Button>
+                ) : (
+                  <RazorpayOrg
+                    amount={finalTotal !== 0 ? finalTotal : totalAmount}
+                    btnTxt={handleButtonTextChange()}
+                    handlePlaceOrder={handlePlaceOrder}
+                  />
+                )}
               </CardContent>
             </Card>
           </div>

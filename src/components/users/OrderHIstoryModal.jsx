@@ -1,6 +1,6 @@
-import { useEffect } from "react";
+import React from "react";
 
-const Modal = ({
+const OrderHistoryModal = ({
   title,
   message,
   isOpen,
@@ -9,27 +9,36 @@ const Modal = ({
   confirmText = "Confirm",
   cancelText = "Cancel",
 }) => {
- 
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "auto";
-    }
-  }, [isOpen]);
+  if (isOpen) {
+    console.log("modla open");
+  }
 
   if (!isOpen) return null;
 
+  console.log("inside order history modal");
+
   return (
-    <div className="fixed inset-0  z-50 flex items-center justify-center ">
-      <div className="bg-black dark:bg-gray-800 p-6 rounded-lg shadow-lg w-96">
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-[9999] flex justify-center items-center">
+      <div
+        className="relative bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl w-96 mx-auto mt-10"
+        role="dialog"
+        aria-labelledby="modal-title"
+        aria-describedby="modal-description"
+        tabIndex="-1"
+      >
         <div className="mb-4">
-          <h2 className="text-xl font-semibold text-white dark:text-white font-primary">
+          <h2
+            id="modal-title"
+            className="text-xl font-semibold text-gray-900 dark:text-white font-primary"
+          >
             {title || "Are you sure?"}
           </h2>
         </div>
         <div className="mb-6">
-          <p className="text-sm text-white dark:text-gray-300 font-primary">
+          <p
+            id="modal-description"
+            className="text-sm text-gray-600 dark:text-gray-300 font-primary"
+          >
             {message || "This action cannot be undone."}
           </p>
         </div>
@@ -38,13 +47,13 @@ const Modal = ({
             onClick={onClose}
             className="px-5 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition duration-300 ease-in-out transform hover:scale-105 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 font-primary"
           >
-            {cancelText || "Cancel"}
+            {cancelText}
           </button>
           <button
             onClick={onConfirm}
             className="px-5 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 transition duration-300 ease-in-out transform hover:scale-105 font-primary"
           >
-            {confirmText || "Confirm"}
+            {confirmText}
           </button>
         </div>
       </div>
@@ -52,4 +61,4 @@ const Modal = ({
   );
 };
 
-export default Modal;
+export default OrderHistoryModal;

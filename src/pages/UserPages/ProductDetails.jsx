@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useGetSingleProductQuery } from "@/app/service/productApiSlice";
 import { Button } from "@/components/ui/button";
 import { data } from "autoprefixer";
@@ -11,29 +11,28 @@ import { Box, CircularProgress } from "@mui/material";
 import { Badge } from "@/components/ui/badge";
 import { useAddToCartMutation } from "@/app/service/cartApiSlice";
 import { toast } from "react-toastify";
+import { useAddToWishlistMutation } from "@/app/service/userApiSlice";
 
 const ProductDetails = () => {
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedSize, setSelectedSize] = useState("large");
+  const [product, setProduct] = useState({});
 
   const { id } = useParams();
   const navigate = useNavigate();
 
-  console.log(id, "id from params");
-
   const { data: productData, error, isLoading } = useGetSingleProductQuery(id);
   const [addToCart] = useAddToCartMutation();
-
-  console.log(productData, "product data fetched for showing product details");
+  const [addToWishlist] = useAddToWishlistMutation()
 
   const handleAddToCart = async () => {
     try {
       const cartData = {
-        productId: productData?.product?._id,
+        productId: product?._id,
         size: selectedSize,
-        price: productData?.product?.price,
-        image: productData?.product?.images[0],
-        productName: productData?.product?.productName,
+        price: product?.price,
+        image: product?.images[0],
+        productName: product?.productName,
       };
 
       console.log(cartData, "data for adding to cart is going");
@@ -49,6 +48,47 @@ const ProductDetails = () => {
       toast.error("please login to add to cart");
     }
   };
+
+  const handleAddToWishlist = async(id) => {
+ 
+    try {
+      const res = await addToWishlist({productId :id}).unwrap()
+
+      if(res.success){
+        toast.success("added to wishlist")
+      }
+
+
+      
+    } catch (error) {
+      console.log(error,"error while adding to wishList")
+      toast.error(error.data.message)
+    }
+  }
+
+  useEffect(() => {
+    if (productData && productData.product) {
+      const { product } = productData;
+      console.log(product, "==Fetched Product");
+
+      const updatedProduct = product.offer
+        ? {
+            ...product,
+            discountedPrice: Math.round(
+              product.price -
+                product.price * (product.offer.offerPercentage / 100)
+            ),
+          }
+        : product;
+
+      console.log(
+        updatedProduct,
+        "=====Updated Product with Discount (if applicable)"
+      );
+
+      setProduct(updatedProduct);
+    }
+  }, [productData]);
 
   if (isLoading) {
     return (
@@ -80,9 +120,10 @@ const ProductDetails = () => {
             <Link to={"/"}>Home</Link>
           </li>
           <ChevronRight className="w-4 h-4" />
-          <li>{productData?.product?.category?.categoryName}</li>
+       
+          <li>{product?.category?.categoryName}</li>
           <ChevronRight className="w-4 h-4" />
-          <li>{productData?.product?.productName}</li>
+          <li>{product?.productName}</li>
         </ul>
       </nav>
       <div className="flex flex-col lg:flex-row gap-8">
@@ -90,27 +131,28 @@ const ProductDetails = () => {
         <div className="flex flex-col md:flex-row lg:w-2/3">
           {/* Thumbnails */}
           <div className="flex md:flex-col gap-2 max-w-xl mb-4 md:mb-0 md:mr-4 order-2 md:order-1">
-            {productData?.product?.images.map((src, index) => (
-              <button
-                key={index}
-                className={`relative aspect-w-1 aspect-h-1 rounded-md overflow-hidden w-1/4 md:w-20 ${
-                  selectedImage === index ? "ring-2 ring-blue-500" : ""
-                }`}
-                onClick={() => setSelectedImage(index)}
-              >
-                <img
-                  src={src}
-                  alt={`Thumbnail ${index + 1}`}
-                  className="w-full h-full object-cover"
-                />
-              </button>
-            ))}
+            {product.images &&
+              product.images.map((src, index) => (
+                <button
+                  key={index}
+                  className={`relative aspect-w-1 aspect-h-1 rounded-md overflow-hidden w-1/4 md:w-20 ${
+                    selectedImage === index ? "ring-2 ring-blue-500" : ""
+                  }`}
+                  onClick={() => setSelectedImage(index)}
+                >
+                  <img
+                    src={src}
+                    alt={`Thumbnail ${index + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+                </button>
+              ))}
           </div>
 
           {/* Main Image */}
           <div className="relative h-[550px] mb-4 md:mb-0 order-1 md:order-2 flex-grow">
             <img
-              src={productData.product.images[selectedImage]}
+              src={product.images && product.images[selectedImage]}
               alt="Product image"
               className="w-full h-full object-contain rounded-lg shadow-lg"
               style={{ maxHeight: "100%", maxWidth: "100%" }} // Ensures the image fits within the container
@@ -147,15 +189,28 @@ const ProductDetails = () => {
         {/* Product Details Section */}
         <div className="lg:w-1/3 bg-white  p-6 rounded-lg shadow-md">
           <h1 className="text-2xl md:text-2xl font-primary font-semibold mb-2">
-            {productData.product.productName}
+            {product?.productName}
           </h1>
+          <p className="text-xl md:text-xl lg:text-xl font-primary mb-4  mt-2 group-hover:text-primary transition-colors duration-300">
+            { product.discountedPrice ? (
+              <>
+                <span className="line-through text-red-400">
+                  ₹{product.price}
+                </span>{" "}
+                <span className="text-green-400">
+                  ₹{product.discountedPrice}
+                </span>
+              </>
+            ) : (
+              `₹${product.price}`
+            )}
+          </p>
 
-          <p className="text-xl md:text-xl lg:text-xl font-primary mb-4">₹{productData.product.price}</p>
           <p className="mb-4 text-gray-700 font-primary">
-            {productData.product.description}
+            {product?.description}
           </p>
           <div>
-            {productData.product.totalStock === 0 ? (
+            {product?.totalStock === 0 ? (
               <div className="flex pt-2 justify-end">
                 <Badge
                   variant="destructive"
@@ -165,7 +220,7 @@ const ProductDetails = () => {
                 </Badge>
               </div>
             ) : (
-              productData.product.totalStock <= 5 && (
+           product?.totalStock <= 5 && (
                 <div className="flex pt-2 justify-end">
                   <Badge
                     variant="destructive"
@@ -182,7 +237,8 @@ const ProductDetails = () => {
           <div className="mb-4">
             <h3 className="font-semibold font-primary mb-2">Choose Size</h3>
             <div className="flex flex-wrap gap-2">
-              {productData.product.sizes.map((size) => (
+              {console.log(product,"====Product")}
+              {product.sizes && product?.sizes.map((size) => (
                 <button
                   key={size._id}
                   className={`px-3 py-2 border-2 font-primary rounded-md ${
@@ -198,7 +254,6 @@ const ProductDetails = () => {
               ))}
             </div>
           </div>
-          
 
           {/* Action Buttons */}
           <div className="flex gap-4 mb-6">
@@ -208,7 +263,7 @@ const ProductDetails = () => {
             >
               Add to Cart
             </Button>
-            <button className="border border-grey p-2 rounded-md hover:bg-gray-100">
+            <button onClick={() => handleAddToWishlist(product._id)}  className="border border-grey p-2 rounded-md hover:bg-gray-100">
               <Heart className="h-4 w-6 text-green-400 fill-green-400" />
             </button>
           </div>

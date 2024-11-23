@@ -15,11 +15,18 @@ import { useGetActiveCategoryQuery } from "@/app/service/userApiSlice";
 const sizes = ["S", "M", "L", "XL"];
 
 const SideBar = ({ onFilterChange }) => {
-  const [priceRange, setPriceRange] = useState([0, 1000]);
+  const [priceRange, setPriceRange] = useState([0, 3000]);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectedBrand, setSelectedBrand] = useState([]);
 
   const { data: categories } = useGetActiveCategoryQuery();
+
+
+  useEffect(() => {
+    if(categories){
+      console.log(categories,"categories ===== in use effect")
+    }
+  })
 
   const handleCategoryChange = (categoryId) => {
     setSelectedCategories((prev) =>
@@ -45,7 +52,7 @@ const SideBar = ({ onFilterChange }) => {
   };
 
   const clearFilters = () => {
-    setPriceRange([0, 1000]);
+    setPriceRange([0, 3000]);
     setSelectedCategories([]);
     setSelectedBrand([]);
   };
@@ -112,7 +119,7 @@ const SideBar = ({ onFilterChange }) => {
           <AccordionContent>
             <Slider
               min={0}
-              max={1000}
+              max={3000}
               step={10}
               value={priceRange}
               onValueChange={handlePriceRangeChange}

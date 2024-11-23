@@ -15,50 +15,17 @@ const OrderSuccess = () => {
   const [orderNumber, setOrderNumber] = useState("");
 
   useEffect(() => {
-    // Generate a UUID for the order number
+
     const newOrderNumber = uuidv4();
     setOrderNumber(newOrderNumber);
   }, []);
-  // const orderDetails = {
-  //   items: [
-  //     { productName: 'Bamboo T-Shirt', size: 'M', quantity: 2, price: 25.0 },
-  //     { productName: 'Bamboo Pants', size: 'L', quantity: 1, price: 40.0 },
-  //   ],
-  //   totalAmount: 90.0,
-  // };
 
-  // const shippingDetails = {
-  //   recipientName: 'John Doe',
-  //   streetAddress: '123 Bamboo Street',
-  //   city: 'Greenville',
-  //   state: 'CA',
-  //   zip: '90210',
-  //   country: 'USA',
-  //   phoneNumber: '123-456-7890',
-  // };
 
-  // const paymentDetails = {
-  //   method: 'Credit Card',
-  //   status: 'Paid',
-  // };
-
-  const nextSteps = [
-    { icon: CheckCircle, text: "Your order is confirmed and being processed." },
-    {
-      icon: Package,
-      text: "Your order will be packaged within 1-2 business days.",
-    },
-    {
-      icon: Truck,
-      text: "Once shipped, you'll receive a tracking number via email.",
-    },
-    { icon: Info, text: "You can contact support if you have any questions." },
-  ];
 
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen  to-slate-50 flex items-center justify-center px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen  to-slate-50 flex items-center justify-center font-primary px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8 bg-gray-200 m-10 p-10 rounded-xl">
         <div className="flex justify-center">
           <div className="rounded-full bg-green-100 p-4">
@@ -79,7 +46,7 @@ const OrderSuccess = () => {
         </div>
 
         <div className="text-center">
-          <h1 className="mt-6 text-3xl font-extrabold text-gray-900">
+          <h1 className="mt-6 text-2xl font-extrabold text-gray-900">
             Order Confirmed!
           </h1>
           <p className="mt-2 text-sm text-gray-600">
@@ -91,24 +58,7 @@ const OrderSuccess = () => {
           </p>
         </div>
 
-        {/* <div className="mt-8">
-          <div className="bg-gray-50 p-6 rounded-md">
-            <h2 className="text-lg font-medium text-gray-900 mb-4">
-              What's Next?
-            </h2>
-            <ul className="space-y-4">
-              {nextSteps.map((item, index) => (
-                <li
-                  key={index}
-                  className="flex items-center space-x-3 text-sm text-gray-600"
-                >
-                  <item.icon className="h-5 w-5 text-customColorTertiary" />
-                  <span>{item.text}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div> */}
+
 
         <div className="mt-6 space-y-4">
           <button

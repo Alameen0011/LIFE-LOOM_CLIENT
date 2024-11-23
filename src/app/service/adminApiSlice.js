@@ -1,5 +1,4 @@
 import { apiSlice } from "./apiSlice";
-import { cartApiSlice } from "./cartApiSlice";
 
 export const adminApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -8,6 +7,13 @@ export const adminApiSlice = apiSlice.injectEndpoints({
         url: "/admin/auth/login",
         method: "POST",
         body: credentials,
+      }),
+    }),
+
+    adminLogout:builder.mutation({
+      query:() => ({
+        url:"/admin/auth/logout",
+        method:"POST"
       }),
     }),
 
@@ -44,23 +50,7 @@ export const adminApiSlice = apiSlice.injectEndpoints({
         body: productDetails,
       }),
 
-      onQueryStarted: async (
-        { productId, body: productDetails },
-        { dispatch, queryFulfilled }
-      ) => {
-        try {
-          // Wait for the mutation to be fulfilled
-          await queryFulfilled;
-
-          // After the mutation is fulfilled, invalidate the Cart tag
-          dispatch(cartApiSlice.util.invalidateTags(["Cart"]));
-        } catch (error) {
-          console.log(
-            error,
-            "Error while invalidating cache of cart from update product API"
-          );
-        }
-      },
+     
 
       // invalidatesTags: ["FetchProduct",'Cart'],
     }),
@@ -166,11 +156,72 @@ export const adminApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ["FetchAdminOrder"],
     }),
+    updateOrderIndividualItemStatus: builder.mutation({
+      query:({orderId,itemId,status}) => ({
+        url:`/admin/order/${orderId}/item/${itemId}/itemOrderStatusChange`,
+        method:"PATCH",
+        body:{status}
+     
+
+      }),
+      invalidatesTags: ["FetchAdminOrder"],
+    }),
+    handleReturnRequest:builder.mutation({
+      query:({orderId,itemId,isApproved}) => ({
+        url:`admin/order/${orderId}/returnResponse`,
+        method:"POST",
+        body:{itemId,isApproved}
+
+      }),
+      invalidatesTags: ["FetchAdminOrder"],
+    }),
+
+    //coupon slice
+
+    createCoupon:builder.mutation({
+      query:(couponData) => ({
+        url:"/admin/coupon/createCoupon",
+        method:"POST",
+        body:couponData
+
+      }),
+      invalidatesTags:["Coupon"]
+    }),
+
+    deleteCoupon : builder.mutation({
+      query:({id}) => ({
+        url:`/admin/coupon/${id}`,
+        method:"DELETE",
+      }),
+      invalidatesTags:["Coupon"]
+    }),
+
+    GetCoupon:builder.query({
+      query:() => ({
+        url:"/admin/coupon/getCoupons"
+      }),
+      providesTags:["Coupon"]
+    }),
+
+    //sales report
+    getSalesReport:builder.query({
+      query:(queryParams) => ({
+        url:`/admin/sales?${queryParams}`,
+        method:"GET",
+
+      })
+    })
+
+
+
+
+
   }),
 });
 
 export const {
   useAdminLoginMutation,
+  useAdminLogoutMutation,
   useFetchUsersQuery,
   useUpdateUserstatusMutation,
   useFetchCategoriesQuery,
@@ -188,4 +239,10 @@ export const {
   useUpdateOrderStatusMutation,
   useFetchSingleOrderQuery,
   useAdminOrderCancelMutation,
+  useCreateCouponMutation,
+  useGetCouponQuery,
+  useDeleteCouponMutation,
+  useUpdateOrderIndividualItemStatusMutation,
+  useHandleReturnRequestMutation,
+  useGetSalesReportQuery
 } = adminApiSlice;

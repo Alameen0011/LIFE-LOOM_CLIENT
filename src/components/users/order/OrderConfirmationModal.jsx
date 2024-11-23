@@ -5,7 +5,7 @@ const OrderConfirmationModal = ({ isOpen, onConfirm, onCancel, message }) => {
     <div
       className={`fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 ${isOpen ? "block" : "hidden"}`}
     >
-      <div className="bg-white rounded-lg shadow-lg w-11/12 max-w-md p-6">
+      <div className="bg-white rounded-lg shadow-lg w-11/12 max-w-md p-6 ">
         <h2 className="text-xl font-semibold text-gray-800">Are you sure?</h2>
         <p className="mt-4 text-gray-600">
           {message || "This action cannot be undone."}

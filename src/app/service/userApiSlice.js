@@ -84,6 +84,65 @@ export const userApiSlice = apiSlice.injectEndpoints({
       query:() => ({
         url:"/user/homeProducts",
         method:"GET"
+      }),
+    }),
+
+    //Coupon management 
+    applyCoupon: builder.mutation({
+      query:(Coupon) => ({
+        url:"/user/order/applyCoupon",
+        method:"POST",
+        body:Coupon
+      }),
+    }),
+
+    //Wishlist management 
+    addToWishlist :builder.mutation({
+      query:(wishlistData) => ({
+        url:"/user/wishlist",
+        method:"POST",
+        body:wishlistData
+      }),
+      invalidatesTags:["wishList"]
+    }),
+
+    removeWishlist:builder.mutation({
+      query:(removeData) => ({
+        url:"/user/wishlist",
+        method:"DELETE",
+        body:removeData
+      }),
+      invalidatesTags:["wishList"]
+    }),
+
+    fetchWishlist:builder.query({
+      query:() => ({
+        url:"/user/wishlist",
+        method:"GET"
+      }),
+      providesTags:["wishList"]
+    }),
+
+    //Return management User
+    returnOrderRequest:builder.mutation({
+      query:({reason,comments,orderId,itemId}) => ({
+        url:`/user/order/${orderId}/product/${itemId}/returnRequest`,
+        method:"POST",
+        body:{reason,comments}
+      }),
+    }),
+
+    //getUser wallet api
+    getWallet:builder.query({
+      query:() => ({
+        url:"user/wallet"
+      })
+    }),
+
+    //fetch user coupon
+    fetchUserCoupon:builder.query({
+      query:() => ({
+        url:"user/getCoupons"
       })
     })
 
@@ -104,5 +163,12 @@ export const {
   useGetActiveCategoryQuery,
   useResetUserPasswordMutation,
   useDeleteAddressMutation,
-  useGetHomeProductsQuery
+  useGetHomeProductsQuery,
+  useApplyCouponMutation,
+  useAddToWishlistMutation,
+  useRemoveWishlistMutation,
+  useFetchWishlistQuery,
+  useReturnOrderRequestMutation,
+  useGetWalletQuery,
+  useFetchUserCouponQuery
 } = userApiSlice;

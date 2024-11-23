@@ -1,17 +1,12 @@
+import Wishlist from "@/components/users/Profile/Wishlist";
 
 const WhishlistPage = () => {
-  console.log("wishList page insider")
+  console.log("wishList page insider");
   return (
-   <>
-   
-   <h2>Hai hello </h2>
+    <>
+      <Wishlist />
+    </>
+  );
+};
 
-   <h3>WishList page</h3>
-   
-   
-   </>
-    
-  )
-}
-
-export default WhishlistPage
+export default WhishlistPage;

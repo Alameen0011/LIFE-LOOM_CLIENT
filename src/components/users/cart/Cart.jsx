@@ -10,7 +10,8 @@ import { Minus, Plus, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import CartNotFound from "./CartNotFound";
-import Modal from "@/components/admin/managementModal";
+import OrderHistoryModal from "../orderHIstoryModal";
+
 
 
 const Cart = () => {
@@ -86,6 +87,9 @@ const Cart = () => {
   const handleCheckout = () => {
     navigate("/order/checkout");
   };
+
+
+  
 
   const subTotal =
     cartItems?.cart?.items?.reduce((acc, item) => {
@@ -249,7 +253,7 @@ const Cart = () => {
         </div>
       </div>
 
-      <Modal
+      <OrderHistoryModal
         title="Are you sure you want to remove this product?"
         message="This action cannot be undone."
         isOpen={showModal}

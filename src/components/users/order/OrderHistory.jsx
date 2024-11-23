@@ -11,11 +11,15 @@ import Modal from "@/components/admin/managementModal";
 import { useNavigate } from "react-router-dom";
 import Pagination from "../Pagination";
 import { toast } from "react-toastify";
+import ReturnModal from "@/components/admin/ReturnModal";
+import { useReturnOrderRequestMutation } from "@/app/service/userApiSlice";
+import OrderHistoryModal from "../orderHIstoryModal";
 
 const OrderHistory = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentItemId, setCurrentItemId] = useState(null);
   const [currentOrderId, setCurrentOrderId] = useState(null);
+  const [returnModalOpen, setReturnModalOpen] = useState(false);
 
   const itemsPerPage = 4;
   const [totalPages, setTotalPages] = useState(0);
@@ -27,6 +31,7 @@ const OrderHistory = () => {
     limit: itemsPerPage,
   });
   const [orderCancel, { data }] = useOrderCancelMutation();
+  const [returnRequest] = useReturnOrderRequestMutation();
 
   console.log(orders, "orders");
 
@@ -48,9 +53,43 @@ const OrderHistory = () => {
   };
 
   const handleCancelRequest = (orderId, itemId) => {
+    console.log("handle cancel request")
     setCurrentItemId(itemId);
     setCurrentOrderId(orderId);
     setIsModalOpen(true);
+  };
+
+  const handleReturnRequest = (orderId, itemId) => {
+    setCurrentItemId(itemId);
+    setCurrentOrderId(orderId);
+    setReturnModalOpen(true);
+  };
+
+  const handleOpenChange = (value) => {
+    setReturnModalOpen(value);
+  };
+
+  const handleReturnRequestApproval = async (reason, comments) => {
+    try {
+      //reason and comments sending to admin for approval part
+      console.log("insider return request api sending part");
+      const res = await returnRequest({
+        reason,
+        comments,
+        orderId: currentOrderId,
+        itemId: currentItemId,
+      }).unwrap();
+
+      console.log(res, "response form return request");
+      if (res.success) {
+        toast.success("requested return successfully");
+      }
+    } catch (error) {
+      console.log(error, "error while feting ");
+      toast.error(error.data.message);
+    }finally{
+      setReturnModalOpen(false)
+    }
   };
 
   const handleConfirmCancel = async () => {
@@ -105,6 +144,7 @@ const OrderHistory = () => {
           <h1 className="text-2xl font-bold text-gray-900 mb-8">
             Order History
           </h1>
+
           <div className="grid gap-3 md:grid-cols-1 lg:grid-cols-1">
             {orders?.orders?.map((order) => (
               <div
@@ -124,9 +164,13 @@ const OrderHistory = () => {
                         day: "numeric",
                         hour: "numeric",
                         minute: "numeric",
-                      
                       })}
                     </p>
+                    {order.status === "Cancelled" && (
+                      <p className="text-sm text-red-500 font-semibold font-primary mt-1">
+                        Order is cancelled
+                      </p>
+                    )}
                   </div>
                 </div>
                 <ul className="mb-4 space-y-2">
@@ -142,24 +186,43 @@ const OrderHistory = () => {
                           {item.price}
                         </span>
                       </div>
+
                       <div className="flex items-center space-x-2">
+                        {/* Status Badge */}
                         <Badge className={`${getStatusColor(item.status)}`}>
                           {item.status}
                         </Badge>
-                        {item.status.toLowerCase() !== "cancelled" &&
-                          item.status.toLowerCase() !== "delivered" && (
-                            <Button
-                              variant="destructive"
-                              size="sm"
-                              className="text-sm"
-                              onClick={() =>
-                                handleCancelRequest(order._id, item._id)
-                              }
-                            >
-                              Cancel
-                              <X className="h-4 w-4 ml-1" />
-                            </Button>
-                          )}
+
+                        {/* Conditional Buttons */}
+                        {item.status.toLowerCase() === "delivered" ? (
+                          // Show Return Button if Status is Delivered
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            className="text-sm"
+                            onClick={() =>
+                              handleReturnRequest(order._id, item._id)
+                            }
+                          >
+                            Return
+                            <X className="h-4 w-4 ml-1" />
+                          </Button>
+                        ) : item.status.toLowerCase() == "returned" ? (
+                             <h2></h2>
+                        ) : item.status.toLowerCase() !== "cancelled" ? (
+                          // Show Cancel Button if Status is Not Cancelled
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            className="text-sm"
+                            onClick={() =>
+                              handleCancelRequest(order._id, item._id)
+                            }
+                          >
+                            Cancel
+                            <X className="h-4 w-4 ml-1" />
+                          </Button>
+                        ) : null}
                       </div>
                     </li>
                   ))}
@@ -191,12 +254,18 @@ const OrderHistory = () => {
         paginate={paginate}
       />
 
-      <Modal
+      <OrderHistoryModal
         title="Are you sure you want to cancel this order?"
         message="This action cannot be undone."
         isOpen={isModalOpen}
         onConfirm={handleConfirmCancel}
         onClose={handleCloseModal}
+      />
+
+      <ReturnModal
+        open={returnModalOpen}
+        onOpenChange={handleOpenChange}
+        onSubmit={handleReturnRequestApproval}
       />
     </div>
   );
