@@ -4,7 +4,7 @@ import {
 } from "@/app/service/orderApiSlice";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ChevronRight, Package, X } from "lucide-react";
+import { ChevronRight, LucideActivity, Package, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Modal from "@/components/admin/managementModal";
@@ -14,6 +14,7 @@ import { toast } from "react-toastify";
 import ReturnModal from "@/components/admin/ReturnModal";
 import { useReturnOrderRequestMutation } from "@/app/service/userApiSlice";
 import OrderHistoryModal from "../orderHIstoryModal";
+import RetryPayment from "@/components/payment/RetryPayment";
 
 const OrderHistory = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -53,7 +54,7 @@ const OrderHistory = () => {
   };
 
   const handleCancelRequest = (orderId, itemId) => {
-    console.log("handle cancel request")
+    console.log("handle cancel request");
     setCurrentItemId(itemId);
     setCurrentOrderId(orderId);
     setIsModalOpen(true);
@@ -87,8 +88,8 @@ const OrderHistory = () => {
     } catch (error) {
       console.log(error, "error while feting ");
       toast.error(error.data.message);
-    }finally{
-      setReturnModalOpen(false)
+    } finally {
+      setReturnModalOpen(false);
     }
   };
 
@@ -115,6 +116,7 @@ const OrderHistory = () => {
     console.log("close modal");
     setIsModalOpen(false);
   };
+
 
   const handleViewDetails = (orderId) => {
     console.log(orderId, "order id in view details click ");
@@ -207,8 +209,6 @@ const OrderHistory = () => {
                             Return
                             <X className="h-4 w-4 ml-1" />
                           </Button>
-                        ) : item.status.toLowerCase() == "returned" ? (
-                             <h2></h2>
                         ) : item.status.toLowerCase() !== "cancelled" ? (
                           // Show Cancel Button if Status is Not Cancelled
                           <Button
@@ -232,6 +232,16 @@ const OrderHistory = () => {
                     Total: ₹{order?.totalAmount?.toFixed(2)}
                   </p>
                   <div className="space-x-2">
+                    {
+                       order.paymentDetails.status == "Failed" && (
+                        <RetryPayment
+                        amount={order?.totalAmount?.toFixed(2)} //finaltotal with discount in future
+                        orderId = {order._id}
+                        
+                        />
+                   
+                      ) 
+                    }
                     <Button
                       onClick={() => handleViewDetails(order._id)}
                       variant="outline"

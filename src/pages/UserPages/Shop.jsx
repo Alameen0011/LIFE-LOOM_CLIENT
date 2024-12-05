@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Select,
   SelectContent,
@@ -12,8 +12,12 @@ import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 import SideBar from "@/components/users/SideBar";
 import Pagination from "@/components/users/Pagination";
+import UserLoading from "@/components/UserLoading";
+import ShimmerEffect from "@/components/shimmers/shimmerEffect";
 
 const Shop = () => {
+
+  
   const [searchTerm, setSearchTerm] = useState("");
   const [filters, setFilters] = useState({});
   const [sortBy, setSortBy] = useState("NewArrivals");
@@ -31,6 +35,7 @@ const Shop = () => {
 
   const navigate = useNavigate();
 
+
   const queryParams = useMemo(() => {
     const params = new URLSearchParams({
       page: currentPage,
@@ -44,29 +49,36 @@ const Shop = () => {
 
   console.log(queryParams, "query params");
 
-  const { data: products } = useGetProductsQuery(queryParams);
+  const { data: products , isLoading } = useGetProductsQuery(queryParams);
 
   useEffect(() => {
     setCurrentPage(products?.page);
     setTotalPages(products?.totalPages);
   }, [products]);
 
-  // console.log(products, "products fetched from api ");
-  // console.log(searchTerm, "search Term");
-  // console.log(sortBy,"sortBy")
 
   const handleProductDetails = (id) => {
     console.log(`Navigate to product details of ID: ${id}`);
     navigate(`/products/${id}`);
   };
 
+  const clearFiltersRef = useRef(null);
+
+  const handleClearFilters = () => {
+    if (clearFiltersRef.current) {
+      clearFiltersRef.current(); 
+    }
+  };
+
   useEffect(() => {
     if (products) {
-      console.log(products,"==products")
+      console.log(products, "==products");
       const updatedProducts = products.filteredProducts.map((product) => {
         if (product.offer) {
           const discount = product.offer.offerPercentage / 100;
-          const discountedPrice =Math.round( product.price - product.price * discount)
+          const discountedPrice = Math.round(
+            product.price - product.price * discount
+          );
           return {
             ...product,
             discountedPrice,
@@ -74,13 +86,16 @@ const Shop = () => {
         }
         return product;
       });
-      console.log(updatedProducts,"=====updatedPRoducts")
-      setFilteredProducts(updatedProducts); // Update the state with discounted prices
+      console.log(updatedProducts, "=====updatedPRoducts");
+      setFilteredProducts(updatedProducts); 
     }
   }, [products]);
 
+  console.log(filteredProducts, "======filitered products");
 
-  console.log(filteredProducts,"======filitered products")
+  if(isLoading){
+    return <ShimmerEffect/>
+  }
 
   return (
     <div className="container mx-auto p-6">
@@ -88,7 +103,7 @@ const Shop = () => {
       <div className="flex flex-col md:flex-row">
         <div className="w-full md:w-1/4 md:sticky top-4 p-6 shadow-lg rounded-lg md:h-screen overflow-y-auto">
           <span className="font-primary font-semibold mb-10">Filters</span>
-          <SideBar onFilterChange={handleFilterChange} />
+          <SideBar onFilterChange={handleFilterChange} onClearFilters={(clearFilters) => (clearFiltersRef.current = clearFilters)} setSearchTerm={setSearchTerm}  />
         </div>
 
         <div className="w-full md:w-3/4 p-6">
@@ -132,69 +147,87 @@ const Shop = () => {
           </div>
 
           <div className="px-2  grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-9 font-primary">
-            {filteredProducts?.map((product) => (
-              <Card
-                onClick={() => handleProductDetails(product._id)}
-                key={product._id}
-                className="bg-white  overflow-hidden flex flex-col group transition-all duration-300 ease-in-out hover:shadow-xl hover:-translate-y-2 hover:bg-gray-50"
-              >
-                <div className="relative pb-[300px] overflow-hidden">
-                  <img
-                    src={product.images[0]}
-                    alt={product.productName}
-                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                  />
-                </div>
+            {filteredProducts.length == 0 ? (
+                <div className="col-span-full text-center py-10">
+            
+                <h2 className="text-lg font-semibold text-gray-600 mt-4">
+                  Oops! No products match your search.
+                </h2>
+                <p className="text-gray-500 mt-2">
+                  Try adjusting your filters or searching for something else.
+                </p>
+                <button
+                  onClick={handleClearFilters} 
+                  className="mt-4 px-6 py-2 bg-primary text-white rounded-md shadow hover:bg-primary-dark transition duration-300"
+                >
+                  Reset Filters
+                </button>
+              </div>
+            ) : (
+              filteredProducts?.map((product) => (
+                <Card
+                  onClick={() => handleProductDetails(product._id)}
+                  key={product._id}
+                  className="bg-white  overflow-hidden flex flex-col group transition-all duration-300 ease-in-out hover:shadow-xl hover:-translate-y-2 hover:bg-gray-50"
+                >
+                  <div className="relative pb-[300px] overflow-hidden">
+                    <img
+                      src={product.images[0]}
+                      alt={product.productName}
+                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                    />
+                  </div>
 
-                <CardContent className="p-4 flex-grow">
-                  <p className="text-sm font-semibold group-hover:text-primary transition-colors duration-300 truncate">
-                    {product.productName}
-                  </p>
+                  <CardContent className="p-4 flex-grow">
+                    <p className="text-sm font-semibold group-hover:text-primary transition-colors duration-300 truncate">
+                      {product.productName}
+                    </p>
 
-                  <p className="text-sm text-gray-500 truncate">
-                    {product.category.categoryName}
-                  </p>
-                  {product.totalStock === 0 ? (
-                    <div className="flex pt-2 justify-end">
-                      <Badge
-                        variant="destructive"
-                        className="group-hover:animate-pulse"
-                      >
-                        Out of stock!
-                      </Badge>
-                    </div>
-                  ) : (
-                    product.totalStock <= 5 && (
+                    <p className="text-sm text-gray-500 truncate">
+                      {product.category.categoryName}
+                    </p>
+                    {product.totalStock === 0 ? (
                       <div className="flex pt-2 justify-end">
                         <Badge
                           variant="destructive"
                           className="group-hover:animate-pulse"
                         >
-                          Only {product.totalStock} left!
+                          Out of stock!
                         </Badge>
                       </div>
-                    )
-                  )}
-
-                  <p className="text-sm font-bold mt-2 group-hover:text-primary transition-colors duration-300">
-                    {product.discountedPrice ? (
-                      <>
-                        <span className="line-through text-gray-500 mr-2">
-                          ₹{product.price}
-                        </span>{" "}
-                        <span className=""  >₹{product.discountedPrice}</span>
-                      </>
                     ) : (
-                      `₹${product.price}`
+                      product.totalStock <= 5 && (
+                        <div className="flex pt-2 justify-end">
+                          <Badge
+                            variant="destructive"
+                            className="group-hover:animate-pulse"
+                          >
+                            Only {product.totalStock} left!
+                          </Badge>
+                        </div>
+                      )
                     )}
-                  </p>
 
-                  <p className="text-sm font-bold mt-2 group-hover:text-primary transition-colors duration-300">
-                    Brand : {product.brand}
-                  </p>
-                </CardContent>
-              </Card>
-            ))}
+                    <p className="text-sm font-bold mt-2 group-hover:text-primary transition-colors duration-300">
+                      {product.discountedPrice ? (
+                        <>
+                          <span className="line-through text-gray-500 mr-2">
+                            ₹{product.price}
+                          </span>{" "}
+                          <span className="">₹{product.discountedPrice}</span>
+                        </>
+                      ) : (
+                        `₹${product.price}`
+                      )}
+                    </p>
+
+                    <p className="text-sm font-bold mt-2 group-hover:text-primary transition-colors duration-300">
+                      Brand : {product.brand}
+                    </p>
+                  </CardContent>
+                </Card>
+              ))
+            )}
           </div>
         </div>
       </div>

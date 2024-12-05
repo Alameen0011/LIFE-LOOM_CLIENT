@@ -2,6 +2,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { setUserCredentials, userlogout } from "../slices/authSlice"
 
 
+
 const baseQuery = fetchBaseQuery({
     baseUrl: import.meta.env.VITE_SERVER_URL,
     credentials: 'include',

@@ -73,14 +73,10 @@ const Checkout = () => {
     }
   };
 
-  const subTotal =
-    cartItems?.cart?.items?.reduce(
-      (acc, item) => acc + item.price * item.quantity,
-      0
-    ) || 0;
-  const finalTotal = couponData?.finalTotal || 0;
-  const discount = couponData?.discount || 0;
+  const subTotal = cartItems?.cart?.items?.reduce((acc, item) => acc + item.price * item.quantity,0 ) || 0;
   const totalAmount = Number(subTotal.toFixed(2));
+  const finalTotal = couponData?.finalTotal || totalAmount;
+  const discount = couponData?.discount || 0;
 
   const handleApplyPromoCode = async () => {
     try {
@@ -103,14 +99,11 @@ const Checkout = () => {
   };
 
   const handlePlaceOrder = async (paymentStatus = "Pending") => {
-    console.log("place order");
-
-    console.log(paymentStatus,"===payment status")
 
     if (!selectedAddress) {
-      console.log(selectedAddress);
+     
       toast.info("please select an address");
-      console.log("please add an address");
+   
       return;
     }
 
@@ -144,7 +137,7 @@ const Checkout = () => {
       },
 
       totalAmount,
-      finalTotal: finalTotal ? Number(finalTotal.toFixed(2)) : 0,
+      finalTotal: finalTotal ? Number(finalTotal.toFixed(2)) : totalAmount,
       discount,
       coupon: promoCode,
     };
@@ -500,9 +493,22 @@ const Checkout = () => {
                       <Label
                         htmlFor="cod"
                         className="flex items-center space-x-2"
+                        disabled={finalTotal > 1000}
                       >
                         <CreditCard className="h-5 w-5" />
-                        <span>Cash on Delivery</span>
+                   
+                      
+                        {
+                           finalTotal > 1000 ? (
+                            <span className="text-xs text-gray-500 ml-2">
+                              (Unavailable for orders above ₹1000)
+                            </span>
+                          ) : (
+                            <span>Cash on Delivery</span>
+                          )
+                        } 
+                        
+                       
                       </Label>
                     </div>
                   </div>

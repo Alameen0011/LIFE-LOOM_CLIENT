@@ -11,14 +11,13 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import CartNotFound from "./CartNotFound";
 import OrderHistoryModal from "../orderHIstoryModal";
-
-
+import UserLoading from "@/components/UserLoading";
 
 const Cart = () => {
   const [showModal, setShowModal] = useState(false);
   const [itemId, setItemId] = useState(null);
 
-  const { data: cartItems } = useGetCartQuery();
+  const { data: cartItems ,isLoading } = useGetCartQuery();
   const [updateCartQuantity] = useUpdateCartQuantityMutation();
   const [clearCart] = useClearCartMutation();
   const navigate = useNavigate();
@@ -64,7 +63,7 @@ const Cart = () => {
   const handleCartRemoveRequest = (itemId) => {
     console.log(itemId);
     setItemId(itemId);
-    setShowModal(true)
+    setShowModal(true);
   };
 
   const handleConfirmCancel = async () => {
@@ -79,17 +78,14 @@ const Cart = () => {
       }
     } catch (error) {
       console.log(error, "error while removing from cart");
-    }finally{
-      setShowModal(false)
+    } finally {
+      setShowModal(false);
     }
   };
 
   const handleCheckout = () => {
     navigate("/order/checkout");
   };
-
-
-  
 
   const subTotal =
     cartItems?.cart?.items?.reduce((acc, item) => {
@@ -98,6 +94,11 @@ const Cart = () => {
   console.log(subTotal, "subtotal");
 
   const total = subTotal;
+
+
+  if(isLoading){
+    return <UserLoading/>
+  }
 
   return (
     <div className="min-h-screen bg-gray-100 py-8">
@@ -217,39 +218,43 @@ const Cart = () => {
             </div>
           )}
 
-          <div className="lg:w-1/3">
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h2 className="text-lg font-semibold mb-4 font-primary">
-                Order Summary
-              </h2>
-              <div className="flex justify-between mb-2 font-primary">
-                <span>Subtotal</span>
-                <span>₹{subTotal.toFixed(2)}</span>
+          {cartItems?.cart?.items?.length !== 0 ? (
+            <div className="lg:w-1/3">
+              <div className="bg-white rounded-lg shadow-md p-6">
+                <h2 className="text-lg font-semibold mb-4 font-primary">
+                  Order Summary
+                </h2>
+                <div className="flex justify-between mb-2 font-primary">
+                  <span>Subtotal</span>
+                  <span>₹{subTotal.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between mb-2 font-primary">
+                  <span>shipping</span>
+                  <span>Free</span>
+                </div>
+                {/* <Separator className="my-4" /> */}
+                <div className="flex justify-between mb-4 font-primary">
+                  <span className="font-semibold">Total</span>
+                  <span className="font-semibold">₹{total.toFixed(2)}</span>
+                </div>
+                {cartItems?.cart?.items?.length === 0 ? (
+                  <Button
+                    disabled={true}
+                    onClick={handleCheckout}
+                    className="w-full font-primary"
+                  >
+                    Proceed to Checkout
+                  </Button>
+                ) : (
+                  <Button onClick={handleCheckout} className="w-full">
+                    Proceed to Checkout
+                  </Button>
+                )}
               </div>
-              <div className="flex justify-between mb-2 font-primary">
-                <span>shipping</span>
-                <span>Free</span>
-              </div>
-              {/* <Separator className="my-4" /> */}
-              <div className="flex justify-between mb-4 font-primary">
-                <span className="font-semibold">Total</span>
-                <span className="font-semibold">₹{total.toFixed(2)}</span>
-              </div>
-              {cartItems?.cart?.items?.length === 0 ? (
-                <Button
-                  disabled={true}
-                  onClick={handleCheckout}
-                  className="w-full font-primary"
-                >
-                  Proceed to Checkout
-                </Button>
-              ) : (
-                <Button onClick={handleCheckout} className="w-full">
-                  Proceed to Checkout
-                </Button>
-              )}
             </div>
-          </div>
+          ) : (
+            null
+          )}
         </div>
       </div>
 

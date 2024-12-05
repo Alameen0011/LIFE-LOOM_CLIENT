@@ -6,7 +6,8 @@ const initialState = localStorage.getItem('auth') ? JSON.parse(localStorage.getI
             name: null,
             accessToken: null,
             role: null,
-            isAuthenticated:null
+            isAuthenticated:null,
+            id:null
         }
     }
 
@@ -19,26 +20,29 @@ const authSlice = createSlice({
     reducers:{
         setUserCredentials: (state, action) => {
             console.log("ACTIOIN PAYLOAD SETTING TO STATE",action.payload)
-            const {username,accessToken,role} = action.payload
+            const {username,accessToken,role,_id} = action.payload
 
             console.log(username)
             console.log(accessToken)
             console.log(role)
+            console.log(_id)
             
             state.user.isAuthenticated = true;
             state.user.name = username
             state.user.accessToken = accessToken
-            state.user.role = role
+            state.user.role = role,
+            state.user.id = _id
          
             
-            localStorage.setItem('auth',JSON.stringify({...initialState,user:{accessToken:action.payload.accessToken,role:action.payload.role,name:action.payload.username, isAuthenticated: true,}}))
+            localStorage.setItem('auth',JSON.stringify({...initialState,user:{accessToken:action.payload.accessToken,role:action.payload.role,name:action.payload.username, isAuthenticated: true,id:action.payload._id}}))
         },
         userlogout: (state) => {
             state.user.accessToken = null
             state.user.role = null
             state.user.name = null
             state.user.isAuthenticated = null
-            localStorage.setItem('auth', JSON.stringify({ ...initialState, user: { accessToken: null, role: null,name:null ,isAuthenticated:null} }))
+            state.user.id = null
+            localStorage.setItem('auth', JSON.stringify({ ...initialState, user: { accessToken: null, role: null,name:null ,isAuthenticated:null,id:null} }))
         }
     }
 })
@@ -50,3 +54,4 @@ export default authSlice.reducer
 export const selectUserState = state => state.auth.user.isAuthenticated
 export const selectUserRole = state => state.auth.user.role
 export const selectUserName = state => state.auth.user.name
+export const selectUserId = state => state.auth.user.id

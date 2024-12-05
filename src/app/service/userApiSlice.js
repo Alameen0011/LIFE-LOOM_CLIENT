@@ -1,3 +1,4 @@
+import { method } from "lodash";
 import { apiSlice } from "./apiSlice";
 
 export const userApiSlice = apiSlice.injectEndpoints({
@@ -143,8 +144,40 @@ export const userApiSlice = apiSlice.injectEndpoints({
     fetchUserCoupon:builder.query({
       query:() => ({
         url:"user/getCoupons"
+      }),
+    }),
+
+
+    //fetch referral code
+    fetchRefferalCode: builder.query({
+      query:() => ({
+        url:"/user/refferal",
+        method:"GET"
       })
-    })
+    }),
+    ApplyRefferalCode: builder.mutation({
+      query: (data) => {
+        console.log("datataatatatattatat ",data)
+          return {
+              url: `/user/refferal`,
+              method: "POST",
+              body:data,
+          };
+      },
+  }),
+    skipRefferalCode : builder.mutation({
+      query:() => ({
+        url:"/user/refferal/skip",
+        method:"POST"
+      }),
+    }),
+    getCheckRefferal : builder.query({
+      query:() => ({
+        url:`/user/refferal/checkStatus`
+
+      })
+    }),
+
 
 
 
@@ -170,5 +203,9 @@ export const {
   useFetchWishlistQuery,
   useReturnOrderRequestMutation,
   useGetWalletQuery,
-  useFetchUserCouponQuery
+  useFetchUserCouponQuery,
+  useFetchRefferalCodeQuery,
+  useGetCheckRefferalQuery,
+  useApplyRefferalCodeMutation,
+  useSkipRefferalCodeMutation
 } = userApiSlice;

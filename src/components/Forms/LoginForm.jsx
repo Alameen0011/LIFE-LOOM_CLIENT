@@ -19,54 +19,49 @@ import {
 import { setUserCredentials } from "@/app/slices/authSlice";
 import { loginSchema } from "@/validationSchemas/Login";
 import { forgotPasswordSchema } from "@/validationSchemas/forgotEmail";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
-
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../ui/dialog";
 
 const LoginForm = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const location = useLocation();
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({ resolver: zodResolver(loginSchema) });
-
-  const {
-    register: registerForgotPassword,
-    handleSubmit: handleSubmitForgotPassword,
-    formState: { errors: forgotPasswordErrors },
-  } = useForm({
-    resolver: zodResolver(forgotPasswordSchema),
-  })
+  const {register,handleSubmit,formState: { errors },} = useForm({ resolver: zodResolver(loginSchema) });
+  const { register: registerForgotPassword,handleSubmit: handleSubmitForgotPassword, formState: { errors: forgotPasswordErrors }} = useForm({ resolver: zodResolver(forgotPasswordSchema)});
 
   const [userLogin, { isLoading }] = useUserLoginMutation();
   const [googleAuth] = useGoogleAuthMutation();
-  const [forgotPassword,{isLoading:forgotPassLoading}] = useFogotPasswordMutation()
+  const [forgotPassword, { isLoading: forgotPassLoading }] = useFogotPasswordMutation();
 
-  const location = useLocation();
+
 
   const from = location.state?.from?.pathname || "/";
 
-  console.log(location?.state?.from?.pathname);
+  console.log(location,"frommmmmm from location");
 
   const handleGoogleAuth = async () => {
     try {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
-      console.log(user, "user");
       const idToken = await user.getIdToken();
-      console.log(idToken, "ID TOKEN FROM google auth");
+     
 
       const res = await googleAuth({ idToken }).unwrap();
-      console.log(res, "Response from api");
       const data = {
         user: res._id,
         role: res.role,
         accessToken: res.accessToken,
       };
-      console.log(data, "data to redux an issue found");
+
       dispatch(setUserCredentials(data));
       navigate("/", { replace: true });
     } catch (error) {
@@ -78,38 +73,31 @@ const LoginForm = () => {
     try {
       const res = await userLogin(data).unwrap();
       console.log("login Response", res);
-      console.log({ ...res });
+
       dispatch(setUserCredentials({ ...res }));
 
       toast.success(res.message);
-      if (res) {
+      if (res.success) {
         navigate(from, { replace: true });
       }
     } catch (error) {
       console.log("Error in login submission", error);
-      toast.error(error?.data?.message);
+      toast.error("Invalid credentials");
     }
   };
 
-  const handleForgotPassword = async(data) => {
-
+  const handleForgotPassword = async (data) => {
     try {
-      const res = await forgotPassword(data).unwrap()
-      if(res.success){
-        toast.success("An otp has been sent to your email")
-        navigate("/auth/forgotOtp")
+      const res = await forgotPassword(data).unwrap();
+      if (res.success) {
+        toast.success("An otp has been sent to your email");
+        navigate("/auth/forgotOtp");
       }
-
-
-
-
-      
     } catch (error) {
-      console.log(error,"error while requessting otp for new pass")
-      toast.error(error.data.message)
+      console.log(error, "error while requessting otp for new pass");
+      toast.error(error.data.message);
     }
-
-  }
+  };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -162,38 +150,57 @@ const LoginForm = () => {
               )}
             </div>
             <div className="mt-2 text-right">
-            <Dialog open={isModalOpen} onOpenChange={setIsModalOpen} className="font-primary">
-              <DialogTrigger asChild>
-                <Button variant="solid" className="p-0 h-auto font-normal no-underline">
-                  Forgot Password?
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle className="font-primary">Reset Password</DialogTitle>
-                  <DialogDescription className=" font-primary">
-                    Enter your email address and we&apos;ll send you a link to reset your password.
-                  </DialogDescription>
-                </DialogHeader>
-                <form onSubmit={handleSubmitForgotPassword(handleForgotPassword)} className="space-y-4">
-                  <div>
-                    {/* <Label htmlFor="reset-email" className="font-primary">Email</Label> */}
-                    <Input
-                      id="reset-email"
-                      type="email"
-                      {...registerForgotPassword('email')}
-                      placeholder="Enter your email"
-                    />
-                    {forgotPasswordErrors.email && (
-                      <p className="text-sm text-red-500 mt-1 font-primary">{forgotPasswordErrors.email.message}</p>
-                    )}
-                  </div>
-                  <Button disabled={forgotPassLoading} type="submit" className="w-40 bg:black ">
-                   {forgotPassLoading ? "sending..." : "send"}
+              <Dialog
+                open={isModalOpen}
+                onOpenChange={setIsModalOpen}
+                className="font-primary"
+              >
+                <DialogTrigger asChild>
+                  <Button
+                    variant="solid"
+                    className="p-0 h-auto font-normal no-underline"
+                  >
+                    Forgot Password?
                   </Button>
-                </form>
-              </DialogContent>
-            </Dialog>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle className="font-primary">
+                      Reset Password
+                    </DialogTitle>
+                    <DialogDescription className=" font-primary">
+                      Enter your email address and we&apos;ll send you a link to
+                      reset your password.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <form
+                    onSubmit={handleSubmitForgotPassword(handleForgotPassword)}
+                    className="space-y-4"
+                  >
+                    <div>
+                      {/* <Label htmlFor="reset-email" className="font-primary">Email</Label> */}
+                      <Input
+                        id="reset-email"
+                        type="email"
+                        {...registerForgotPassword("email")}
+                        placeholder="Enter your email"
+                      />
+                      {forgotPasswordErrors.email && (
+                        <p className="text-sm text-red-500 mt-1 font-primary">
+                          {forgotPasswordErrors.email.message}
+                        </p>
+                      )}
+                    </div>
+                    <Button
+                      disabled={forgotPassLoading}
+                      type="submit"
+                      className="w-40 bg:black "
+                    >
+                      {forgotPassLoading ? "sending..." : "send"}
+                    </Button>
+                  </form>
+                </DialogContent>
+              </Dialog>
             </div>
           </div>
 

@@ -34,7 +34,10 @@ const WishlistItem = ({ item, onRemove }) => {
       const res = await addToCart(cartData).unwrap();
 
       if (res.success) {
+        
+
         toast.success("added to cart Successfully");
+        onRemove(item._id);
       }
 
       console.log(res, "response from adding to cart");
@@ -146,16 +149,14 @@ const Wishlist = () => {
     try {
       const res = await removeWishlist({ productId: itemId }).unwrap();
       console.log(res, "response form removing wishlist item");
-      if (res.success) {
-        toast.success("removed from wishlist successfully");
-      }
+   
     } catch (error) {
       console.log(error, "error while removing item from wishlist");
     }
   };
 
   return (
-    <div className="flex-1 container mx-auto max-w-3xl p-6 bg-gray-20 min-h-screen font-primary">
+    <div className="flex-1 container mx-auto max-w-3xl p-6 bg-gray-20 min-h-screen font-primary ">
       <h1 className="text-xl font-bold mb-6">My Wishlist</h1>
       {wishlistItems?.products?.length === 0 ? (
         <EmptyState />

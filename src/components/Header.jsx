@@ -18,10 +18,6 @@ const Header = () => {
   const isAuthenticated = useSelector(selectUserState);
   const [userLogout] = useLogoutUserMutation();
 
-
-
-
-
   //we have to call category from user api slice inorder to show on dropdonw
 
   const toggleMenu = () => setIsOpen(!isOpen);
@@ -79,31 +75,24 @@ const Header = () => {
             </Link>
           </div>
           {/* Center: Navigation (Desktop) */}
-          <nav className="hidden md:flex space-x-4">
+          <nav className="hidden md:flex space-x-6">
             <Link
               to="/"
-              className="font-primary  text-gray-600 hover:text-gray-900"
+              className="font-primary text-gray-700 border-b-2 border-transparent hover:border-black transition-all duration-500"
             >
               Home
             </Link>
             <Link
               to="/products"
-              className="font-primary  text-gray-600 hover:text-gray-900"
+              className="font-primary text-gray-700 border-b-2 border-transparent hover:border-black transition-all duration-500"
             >
-              shop
-            </Link>
-   
-            <Link
-              to="/contact"
-              className="font-primary text-gray-600 hover:text-gray-900"
-            >
-              Contact Us
+              Shop
             </Link>
             <Link
               to="/about"
-              className="font-primary text-gray-600 hover:text-gray-900"
+              className="font-primary text-gray-700 border-b-2 border-transparent hover:border-black transition-all duration-500"
             >
-              About Page
+              About Us
             </Link>
           </nav>
           {/* Right: Icons */}
@@ -128,7 +117,10 @@ const Header = () => {
                 />
               </svg>
             </Link>
-            <Link to="/profile/myProfile" className="text-gray-600 hover:text-gray-900">
+            <Link
+              to="/profile/myProfile"
+              className="text-gray-600 hover:text-gray-900"
+            >
               <svg
                 width="20"
                 height="21"
@@ -175,23 +167,18 @@ const Header = () => {
           </div>
         </div>
       </div>
+
       {/* Mobile menu */}
       {isOpen && (
         <div className="md:hidden">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            <Link
-              to="/"
-              className="font-primary block text-gray-600 hover:text-gray-900 py-2"
-            >
-              Home
-            </Link>
             <Link
               to="/products"
               className="font-primary block text-gray-600 hover:text-gray-900 py-2"
             >
               Home
             </Link>
-           
+
             <Link
               to="/contact"
               className=" font-primary   block text-gray-600 hover:text-gray-900 py-2"

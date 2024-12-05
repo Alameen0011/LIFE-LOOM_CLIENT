@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { useAddToCartMutation } from "@/app/service/cartApiSlice";
 import { toast } from "react-toastify";
 import { useAddToWishlistMutation } from "@/app/service/userApiSlice";
+import UserLoading from "@/components/UserLoading";
 
 const ProductDetails = () => {
   const [selectedImage, setSelectedImage] = useState(0);
@@ -91,19 +92,7 @@ const ProductDetails = () => {
   }, [productData]);
 
   if (isLoading) {
-    return (
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          height: "100vh",
-        }}
-      >
-        <CircularProgress />
-      </Box>
-    );
+    return <UserLoading/>
   }
 
   if (error) return <p>Error loading product</p>;

@@ -14,12 +14,19 @@ import { useGetActiveCategoryQuery } from "@/app/service/userApiSlice";
 
 const sizes = ["S", "M", "L", "XL"];
 
-const SideBar = ({ onFilterChange }) => {
+const SideBar = ({ onFilterChange , onClearFilters ,setSearchTerm }) => {
   const [priceRange, setPriceRange] = useState([0, 3000]);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectedBrand, setSelectedBrand] = useState([]);
 
   const { data: categories } = useGetActiveCategoryQuery();
+
+  useEffect(() => {
+    if (onClearFilters) {
+      onClearFilters(clearFilters);
+    }
+  }, [onClearFilters]);
+
 
 
   useEffect(() => {
@@ -55,6 +62,7 @@ const SideBar = ({ onFilterChange }) => {
     setPriceRange([0, 3000]);
     setSelectedCategories([]);
     setSelectedBrand([]);
+    setSearchTerm("")
   };
 
   useEffect(() => {

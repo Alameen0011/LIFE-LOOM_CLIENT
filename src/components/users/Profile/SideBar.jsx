@@ -60,6 +60,12 @@ const SideBar = () => {
               Coupons
             </Link>
           </Button>
+          <Button variant="ghost" className="justify-start  font-primary font-semibold  gap-2" asChild>
+            <Link to="/profile/refferal">
+              <Ticket className="h-4 w-4" />
+              Refferal
+            </Link>
+          </Button>
         </nav>
       </div>
     </div>

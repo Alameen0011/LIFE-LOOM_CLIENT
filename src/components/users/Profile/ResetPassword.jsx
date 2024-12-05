@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -12,17 +11,14 @@ import { ChevronRight, KeyRound } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ResetPasswordSchema } from "@/validationSchemas/resetPassword";
 import { useResetUserPasswordMutation } from "@/app/service/userApiSlice";
 import { toast } from "react-toastify";
+import { ResetPasswordUserProfileSchema } from "@/validationSchemas/resetUserProfilePassword";
 
 const ResetPassword = () => {
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm({ resolver: zodResolver(ResetPasswordSchema) });
+  const { register,handleSubmit,reset,formState: { errors } } = useForm({ resolver: zodResolver(ResetPasswordUserProfileSchema) });
+
+  console.log("insider resetPassword")
 
   const [ResetPassword, { isLoading }] = useResetUserPasswordMutation();
 
@@ -33,13 +29,15 @@ const ResetPassword = () => {
       const res = await ResetPassword(data).unwrap();
 
       console.log(res, "response form reset password api");
-      toast.success(res.message)
-      reset()
+      if (res.success) {
+        toast.success(res.message);
+      }
+
+      reset();
     } catch (error) {
       console.log(error, "error while reseting the password");
-      toast.error(error.data.message)
-      reset()
-
+      toast.error(error.data.message);
+      reset();
     }
   };
 
@@ -65,7 +63,6 @@ const ResetPassword = () => {
           <CardTitle className="text-2xl font-semibold font-primary">
             Update Your Password
           </CardTitle>
-          
         </CardHeader>
         <CardContent className="p-5">
           <form

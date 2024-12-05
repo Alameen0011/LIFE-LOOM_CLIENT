@@ -8,9 +8,15 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
-import { useGetSalesReportQuery } from "@/app/service/adminApiSlice";
+import {
+  useGetSalesReportQuery,
+  useLazyGetSalesPdfQuery,
+  useLazyGetSalesXlQuery,
+} from "@/app/service/adminApiSlice";
 import Pagination from "../users/Pagination";
 import { DownloadCloud, FileSpreadsheetIcon } from "lucide-react";
+import { saveAs } from "file-saver";
+import { toast } from "react-toastify";
 
 const SalesReport = () => {
   const [activeTab, setActiveTab] = useState("");
@@ -18,7 +24,7 @@ const SalesReport = () => {
   const [startDate, setStartDate] = useState(null);
   const [totalAmount, setTotalAmount] = useState("");
   const [endDate, setEndDate] = useState(null);
-  const[totalDiscount,setTotalDiscount] = useState("")
+  const [totalDiscount, setTotalDiscount] = useState("");
   const [totalPages, setTotalPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
@@ -51,6 +57,8 @@ const SalesReport = () => {
   }, [currentPage, itemsPerPage, activeTab, startDate, endDate]);
 
   console.log(queryParams, "query params");
+  const [triggerDownload] = useLazyGetSalesPdfQuery();
+  const [triggerDownloadXl] = useLazyGetSalesXlQuery()
 
   const { data: salesReportData } = useGetSalesReportQuery(queryParams);
 
@@ -61,7 +69,7 @@ const SalesReport = () => {
       setCurrentPage(salesReportData.page);
       setTotalPages(salesReportData.totalPages);
       setTotalAmount(salesReportData.totalOrderAmount);
-      setTotalDiscount(salesReportData.totalDiscount)
+      setTotalDiscount(salesReportData.totalDiscount);
     }
   }, [salesReportData]);
 
@@ -70,16 +78,81 @@ const SalesReport = () => {
     console.log(totalAmount, "total amount");
   }, [salesData, totalAmount]);
 
-  const handleApplyDateFilter = () => {
-    console.log("handle apply date filter");
+  /*
+    const handlePdfDownload = async () => {
+    try {
+      const response = await axiosInstance.get(
+        `/admin/download/report/pdf?period=${activeTab}&startDate=${startDate}&endDate=${endDate}`,
+        { responseType: "blob" }
+      );
+
+      const blob = new Blob([response.data], { type: "application/pdf" });
+      saveAs(blob, "SALES REPORT.pdf");
+
+    } catch (error) {
+      console.error(error);
+    }
   };
 
-  const handleDownloadPdf = () => {
-    console.log("handle download pdf");
+  const handleXldownload = async () => {
+    try {
+      const response = await axiosInstance.get(
+        `/admin/download/report/xl?period=${activeTab}&startDate=${startDate}&endDate=${endDate}`,
+        { responseType: "blob" }
+      );
+
+      const blob = new Blob([response.data], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+      saveAs(blob, "SalesReport.xlsx");
+
+    } catch (error) {
+      console.error(error);
+    }
   };
 
-  const handleDownloadExcel = () => {
+
+
+
+  */
+
+  const handleDownloadPdf = async () => {
+    try {
+      console.log("inside pdf download");
+      // Trigger the query and unwrap the result
+      const blob = await triggerDownload({
+        period: activeTab,
+        startDate,
+        endDate,
+      }).unwrap();
+
+      console.log(blob, "blob generated going to save in file savver");
+
+  
+
+      const officialBlob = new Blob([blob], { type: "application/pdf" });
+      console.log(officialBlob.size,"blbobb sizs"); // Should not be 0
+      console.log(officialBlob.type,"blob type"); // Should be 'application/pdf'
+      saveAs(officialBlob, "sales_Report.pdf");
+
+      // toast.success("PDF downloaded successfully!");
+
+      toast.success("downloaded pdf successfully");
+    } catch (err) {
+      console.error("Error downloading the PDF:", err);
+    }
+  };
+
+  const handleDownloadExcel = async() => {
     console.log("handle download excel");
+
+
+    const blob = await triggerDownloadXl({  period: activeTab, startDate, endDate }).unwrap()
+
+    console.log(blob,"blob xllll")
+
+    const officialBlob = new Blob([blob], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
+    saveAs(officialBlob, "SalesReport.xlsx");
   };
 
   return (
@@ -151,7 +224,7 @@ const SalesReport = () => {
 
         {/* Sales Table */}
         <div className="bg-white rounded-lg border mb-6 overflow-x-auto">
-          <Table >
+          <Table>
             <TableHeader>
               <TableRow className="font-semibold">
                 <TableHead>User</TableHead>

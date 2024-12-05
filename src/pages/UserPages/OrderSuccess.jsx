@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import {
   ShoppingCart,
   ArrowRightCircle,
@@ -24,10 +25,25 @@ const OrderSuccess = () => {
 
   const navigate = useNavigate();
 
+  const containerVariants = {
+    hidden: { opacity: 0, scale: 0.9 },
+    visible: { opacity: 1, scale: 1, transition: { duration: 0.5, ease: "easeOut" } },
+  };
+
   return (
     <div className="min-h-screen  to-slate-50 flex items-center justify-center font-primary px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-gray-200 m-10 p-10 rounded-xl">
-        <div className="flex justify-center">
+       <motion.div
+        className="max-w-md w-full space-y-8 bg-white shadow-xl p-10 rounded-3xl border border-gray-200"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+   
+   <motion.div
+          className="flex justify-center"
+          initial={{ scale: 0.5 }}
+          animate={{ scale: 1, transition: { duration: 0.6, ease: "backOut" } }}
+        >
           <div className="rounded-full bg-green-100 p-4">
             <svg
               className="w-24 h-24 text-green-600"
@@ -36,14 +52,10 @@ const OrderSuccess = () => {
               stroke="currentColor"
               strokeWidth={2}
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M5 13l4 4L19 7"
-              />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
             </svg>
           </div>
-        </div>
+        </motion.div>
 
         <div className="text-center">
           <h1 className="mt-6 text-2xl font-extrabold text-gray-900">
@@ -89,7 +101,8 @@ const OrderSuccess = () => {
             </a>
           </p>
         </div>
-      </div>
+      
+      </motion.div>
     </div>
   );
 };

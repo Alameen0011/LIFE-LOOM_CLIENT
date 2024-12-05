@@ -34,6 +34,13 @@ export const orderApiSlice = apiSlice.injectEndpoints({
             }),
             invalidatesTags:["FetchOrders"]
         }),
+        retryOrderPayment:builder.mutation({
+            query:(data) => ({
+                url:"/user/order/retryPayment",
+                method:"POST",
+                body:data
+            })
+        })
     })
 })
 
@@ -43,4 +50,5 @@ export const {
     useGetOrderQuery,
     useGetSingleOrderQuery,
     useOrderCancelMutation,
+    useRetryOrderPaymentMutation
 } = orderApiSlice

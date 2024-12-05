@@ -45,6 +45,8 @@ import MyCoupon from "@/pages/UserPages/MyCoupon";
 import ForgotOtp from "@/pages/ForgotOtp";
 import ResetPasswordPage from "@/pages/ResetPasswordPage";
 import SalesReport from "@/components/admin/SalesReport";
+import RefferalPage from "@/pages/UserPages/RefferalPage";
+import AboutUs from "@/pages/AboutUs";
 
 const router = createBrowserRouter([
   {
@@ -55,7 +57,7 @@ const router = createBrowserRouter([
       { path: "/", element: <HomePage /> },
       { path: "/products", element: <Shop /> },
       { path: "/products/:id", element: <ProductDetails /> },
-
+      { path: "/about", element: <AboutUs /> },
       { path: "*", element: <NotFoundPage /> },
       {
         path: "/cart",
@@ -64,12 +66,12 @@ const router = createBrowserRouter([
       },
       {
         path: "/wishlist",
-        element: <RequireUserAuth />, // Protected route
+        element: <RequireUserAuth />, 
         children: [{ path: "", element: <WhishlistPage /> }],
       },
       {
         path: "/profile",
-        element: <RequireUserAuth />, // Protected route
+        element: <RequireUserAuth />,
         children: [
           { path: "orders", element: <MyOrder /> },
           { path: "myProfile", element: <MyProfile /> },
@@ -78,9 +80,9 @@ const router = createBrowserRouter([
           { path: "addAddress", element: <MyNewAddress /> },
           { path: "myResetPassword", element: <MyResetPassword /> },
           { path: "editProfile/:id", element: <MyEditAddress /> },
-
           { path: "wallet", element: <MyWallet /> },
           { path: "coupons", element: <MyCoupon /> },
+          { path: "refferal", element: <RefferalPage /> }
         ],
       },
       {

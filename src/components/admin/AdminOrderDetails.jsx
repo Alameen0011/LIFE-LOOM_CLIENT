@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { FileText } from "lucide-react";
+import { Download, FileText } from "lucide-react";
 import { useParams } from "react-router-dom";
 import {
   useAdminOrderCancelMutation,
   useFetchSingleOrderQuery,
+  useLazyGetInvoiceDataQuery,
   useUpdateOrderIndividualItemStatusMutation,
 } from "@/app/service/adminApiSlice";
 import Modal from "./managementModal";
 import { toast } from "react-toastify";
+import { saveAs } from "file-saver";
 
 const AdminOrderDetails = () => {
   const [showModal, setShowModal] = useState(false);
@@ -23,6 +25,7 @@ const AdminOrderDetails = () => {
   const { data } = useFetchSingleOrderQuery(id);
   const [orderCancel] = useAdminOrderCancelMutation();
   const [itemStatusChange] = useUpdateOrderIndividualItemStatusMutation();
+  const [triggerInvoiceDownload] = useLazyGetInvoiceDataQuery()
 
   const handleCancelOrderRequest = (orderId, itemId) => {
     console.log(orderId, itemId, "clicked on button for cancel ");
@@ -50,6 +53,26 @@ const AdminOrderDetails = () => {
       toast.error(error.data.message);
     }
   };
+
+  const handleInvoiceDownload = async () => {
+    try {
+      console.log(id,"order id while cliking ")
+
+      const res = await triggerInvoiceDownload({orderId:id}).unwrap()
+
+      console.log(res)
+
+      const blob = new Blob([res],{ type: "application/pdf"   })
+     
+
+      saveAs(blob,"invoice.pdf")
+      toast.success("invoice downloaded successfully")
+      
+    } catch (error) {
+      console.log(error,"error while downllading invoice")
+      toast.error("please try again later")
+    }
+  }
 
   const handleConfirmCancel = async () => {
     console.log(orderId, itemId, "order id,itemId");
@@ -79,7 +102,7 @@ const AdminOrderDetails = () => {
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-4">
           <span className="text-muted-foreground">Welcome!</span>
-          <span className="font-medium">{data?.order?.user?.firstName}</span>
+          {/* <span className="font-medium">{data?.order?.user?.firstName}</span> */}
         </div>
         <h1 className="text-2xl font-bold font-primary">Order Details</h1>
       </div>
@@ -90,10 +113,10 @@ const AdminOrderDetails = () => {
             orderId: {data?.order?._id}
           </p>
         </div>
-        {/* <Button variant="outline" className="gap-2">
+         <Button onClick= {() => handleInvoiceDownload()}  variant="outline" className="gap-2">
         <Download className="h-4 w-4" />
         Invoice
-      </Button> */}
+      </Button> 
       </div>
 
       <div className="grid md:grid-cols-3 gap-6">
