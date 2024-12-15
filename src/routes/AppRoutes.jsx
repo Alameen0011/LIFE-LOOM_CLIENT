@@ -1,10 +1,10 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
-import ErrorPage from "../pages/ErrorPage";
+import ErrorPage from "@/pages/ErrorPage";
 import AuthLayout from "@/layouts/AuthLayout";
-import SignupPage from "../pages/signupPage";
-import LoginPage from "../pages/LoginPage";
-import MainLayout from "../layouts/MainLayout";
-import NotFoundPage from "../pages/NotFoundPage";
+import SignupPage from "@/pages/SignupPage";
+import LoginPage from "@/pages/LoginPage";
+import MainLayout from "@/layouts/MainLayout";
+import NotFoundPage from "@/pages/NotFoundPage";
 import AdminLayout from "@/layouts/AdminLayout";
 import AdminLoginPage from "@/pages/adminPages/AdminLoginPage";
 import OtpPage from "@/pages/OtpPage";
@@ -38,7 +38,6 @@ import Offer from "@/pages/adminPages/Offer";
 import AddOffer from "@/pages/adminPages/AddOffer";
 import Coupon from "@/pages/adminPages/Coupon";
 import AddCoupon from "@/components/admin/AddCoupon";
-
 import MyWallet from "@/components/users/Profile/MyWallet";
 import RequireAdminAuth from "./ProtectedRoutes/RequireAdminAuth";
 import MyCoupon from "@/pages/UserPages/MyCoupon";
