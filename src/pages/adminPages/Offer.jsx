@@ -2,12 +2,13 @@ import {
   useDeleteOfferMutation,
   useFetchOffersQuery,
 } from "@/app/service/offerApiSlice";
-import AdminLoading from "@/components/admin/adminLoading";
+import AdminLoading from "@/components/admin/AdminLoading";
+
 import OfferTable from "@/components/admin/OfferTable";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Filter, Plus, Search } from "lucide-react";
+import {  Plus} from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";

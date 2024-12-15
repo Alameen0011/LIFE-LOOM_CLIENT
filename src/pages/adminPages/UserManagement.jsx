@@ -3,13 +3,9 @@ import {
   useUpdateUserstatusMutation,
 } from "@/app/service/adminApiSlice";
 import Modal from "@/components/admin/managementModal";
-import { Input } from "@/components/ui/input";
 import Pagination from "@/components/users/Pagination";
-import { Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { useSelector, useDispatch } from "react-redux";
-import { userlogout } from "@/app/slices/authSlice";
 import AdminLoading from "@/components/admin/AdminLoading";
 
 const UserManagement = () => {
@@ -33,7 +29,6 @@ const UserManagement = () => {
 
   console.log(Allusers);
 
-  const dispatch = useDispatch();
 
   // Function to handle blocking the user via the modal
   const handleBlockUser = (user) => {
