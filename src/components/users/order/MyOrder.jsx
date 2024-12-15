@@ -3,7 +3,7 @@ import OrderHistory from './orderHistory'
 
 const MyOrder = () => {
   return (
-    <div className="flex min-h-screen mx-auto max-w-5xl my-10 bg-background">
+    <div className="flex  min-h-screen mx-auto max-w-5xl my-10 bg-background">
     {/* Sidebar */}
     <SideBar />
 

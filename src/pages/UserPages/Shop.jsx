@@ -16,8 +16,6 @@ import UserLoading from "@/components/UserLoading";
 import ShimmerEffect from "@/components/shimmers/shimmerEffect";
 
 const Shop = () => {
-
-  
   const [searchTerm, setSearchTerm] = useState("");
   const [filters, setFilters] = useState({});
   const [sortBy, setSortBy] = useState("NewArrivals");
@@ -35,7 +33,6 @@ const Shop = () => {
 
   const navigate = useNavigate();
 
-
   const queryParams = useMemo(() => {
     const params = new URLSearchParams({
       page: currentPage,
@@ -49,13 +46,12 @@ const Shop = () => {
 
   console.log(queryParams, "query params");
 
-  const { data: products , isLoading } = useGetProductsQuery(queryParams);
+  const { data: products, isLoading } = useGetProductsQuery(queryParams);
 
   useEffect(() => {
     setCurrentPage(products?.page);
     setTotalPages(products?.totalPages);
   }, [products]);
-
 
   const handleProductDetails = (id) => {
     console.log(`Navigate to product details of ID: ${id}`);
@@ -66,7 +62,7 @@ const Shop = () => {
 
   const handleClearFilters = () => {
     if (clearFiltersRef.current) {
-      clearFiltersRef.current(); 
+      clearFiltersRef.current();
     }
   };
 
@@ -87,14 +83,14 @@ const Shop = () => {
         return product;
       });
       console.log(updatedProducts, "=====updatedPRoducts");
-      setFilteredProducts(updatedProducts); 
+      setFilteredProducts(updatedProducts);
     }
   }, [products]);
 
   console.log(filteredProducts, "======filitered products");
 
-  if(isLoading){
-    return <ShimmerEffect/>
+  if (isLoading) {
+    return <ShimmerEffect />;
   }
 
   return (
@@ -103,19 +99,25 @@ const Shop = () => {
       <div className="flex flex-col md:flex-row">
         <div className="w-full md:w-1/4 md:sticky top-4 p-6 shadow-lg rounded-lg md:h-screen overflow-y-auto">
           <span className="font-primary font-semibold mb-10">Filters</span>
-          <SideBar onFilterChange={handleFilterChange} onClearFilters={(clearFilters) => (clearFiltersRef.current = clearFilters)} setSearchTerm={setSearchTerm}  />
+          <SideBar
+            onFilterChange={handleFilterChange}
+            onClearFilters={(clearFilters) =>
+              (clearFiltersRef.current = clearFilters)
+            }
+            setSearchTerm={setSearchTerm}
+          />
         </div>
 
         <div className="w-full md:w-3/4 p-6">
-          <div className="flex items-center mb-6 space-x-4">
+          <div className="flex flex-col sm:flex-row items-center mb-6 space-y-4 sm:space-y-0 sm:space-x-4">
             {/* Title with spacing */}
-            <h2 className="text-2xl font-semibold font-primary mr-4">
+            <h2 className="text-2xl font-semibold font-primary sm:mr-4 text-center sm:text-left">
               Products
             </h2>
 
             {/* Centered Search Bar */}
-            <div className="flex-grow flex justify-center">
-              <div className="flex items-center border  border-black rounded-md overflow-hidden w-full max-w-72">
+            <div className="w-full sm:flex-grow flex justify-center">
+              <div className="flex items-center border border-black rounded-md overflow-hidden w-full sm:max-w-72">
                 <span className="p-2">
                   <Search className="h-5 w-5" />
                 </span>
@@ -130,9 +132,9 @@ const Shop = () => {
             </div>
 
             {/* Sort Dropdown with spacing */}
-            <div className="ml-4">
+            <div className="w-full sm:w-auto sm:ml-4">
               <Select onValueChange={(value) => setSortBy(value)}>
-                <SelectTrigger className="border border-gray-300 p-2 rounded-md w-52">
+                <SelectTrigger className="border border-gray-300 p-2 rounded-md w-full sm:w-52">
                   <span>Sort by: {sortBy || "Select"}</span>
                 </SelectTrigger>
                 <SelectContent>
@@ -148,8 +150,7 @@ const Shop = () => {
 
           <div className="px-2  grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-9 font-primary">
             {filteredProducts.length == 0 ? (
-                <div className="col-span-full text-center py-10">
-            
+              <div className="col-span-full text-center py-10">
                 <h2 className="text-lg font-semibold text-gray-600 mt-4">
                   Oops! No products match your search.
                 </h2>
@@ -157,7 +158,7 @@ const Shop = () => {
                   Try adjusting your filters or searching for something else.
                 </p>
                 <button
-                  onClick={handleClearFilters} 
+                  onClick={handleClearFilters}
                   className="mt-4 px-6 py-2 bg-primary text-white rounded-md shadow hover:bg-primary-dark transition duration-300"
                 >
                   Reset Filters

@@ -16,7 +16,8 @@ const HomePage = () => {
   const [showPopup, setShowPopup] = useState(false);
   const navigate = useNavigate();
 
-  const { data: checkRefferal ,refetch:refetchRefferal } = useGetCheckRefferalQuery();
+  const { data: checkRefferal, refetch: refetchRefferal } =
+    useGetCheckRefferalQuery();
 
   useEffect(() => {
     console.log(checkRefferal, "checking refferal");
@@ -26,7 +27,6 @@ const HomePage = () => {
   }, [checkRefferal]);
 
   useEffect(() => {
- 
     refetchRefferal();
   }, []);
 
@@ -44,23 +44,25 @@ const HomePage = () => {
   return (
     <div className="min-h-screen bg-white overflow-y-auto">
       {/* Hero Section */}
-      <section className="relative h-[80vh] bg-white flex items-center justify-center">
-        <div className="container mx-auto px-6 sm:px-12 lg:px-20 max-w-screen-xl">
-          <div className="flex flex-col-reverse md:flex-row items-center ">
+      <section className="relative h-auto bg-white flex items-center justify-center py-10 md:py-16">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-10 max-w-screen-xl">
+          <div className="flex flex-col-reverse md:flex-row items-center">
             {/* Text Section */}
             <div className="w-full md:w-1/2 text-center md:text-left mt-8 md:mt-0 px-4">
-              <h1 className="text-2xl sm:text-2xl lg:text-2xl font-bold font-primary mb-4 text-gray-800">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold font-primary mb-4 text-gray-800">
                 Introducing Life and Loom
               </h1>
-              <p className="text-sm sm:text-md lg:text-lg font-primary text-gray-600 mb-6">
-                Discover the comfort and sustainability of bamboo clothing with Life and Loom.
-                Our eco-friendly collections for men redefine style and responsibility, offering breathable, 
-                durable, and planet-friendly apparel. Join us in embracing fashion that cares for the Earth.
+              <p className="text-sm sm:text-base lg:text-lg font-primary text-gray-600 mb-6">
+                Discover the comfort and sustainability of bamboo clothing with
+                Life and Loom. Our eco-friendly collections redefine style and
+                responsibility, offering breathable, durable, and
+                planet-friendly apparel. Join us in embracing fashion that cares
+                for the Earth.
               </p>
               <Button
                 onClick={() => navigate("/products")}
                 size="lg"
-                className="bg-gray-400 hover:bg-black text-white px-6 py-3 rounded-md"
+                className="bg-black hover:bg-black text-white px-6 py-3 rounded-md"
               >
                 Shop Now
               </Button>
@@ -68,7 +70,7 @@ const HomePage = () => {
 
             {/* Image Section */}
             <div className="w-full md:w-1/2 flex justify-center mt-8 md:mt-0">
-              <div className="w-3/4 sm:w-2/3 lg:w-1/2 h-auto flex items-center justify-center p-4 bg-gray-100 rounded-lg shadow-lg">
+              <div className="w-full sm:w-2/3 md:w-3/4 lg:w-2/3 xl:w-1/2 h-auto p-4 bg-gray-100 rounded-lg shadow-lg">
                 <img
                   src="/Home.webp"
                   alt="Bamboo Clothing"
@@ -156,7 +158,9 @@ const HomePage = () => {
       <div className="flex justify-center mt-5 px-6 max-w-screen-xl mx-auto">
         <section className="py-12 w-full">
           <div className="container max-w-7xl mx-auto px-6 sm:px-12 lg:px-20">
-            <h2 className="text-2xl font-semibold mb-6 font-primary">Trending</h2>
+            <h2 className="text-2xl font-semibold mb-6 font-primary">
+              Trending
+            </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-9">
               {trending?.products?.map((product) => (
                 <Card

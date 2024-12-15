@@ -17,9 +17,10 @@ import Pagination from "../users/Pagination";
 import { DownloadCloud, FileSpreadsheetIcon } from "lucide-react";
 import { saveAs } from "file-saver";
 import { toast } from "react-toastify";
+import AdminLoading from "./adminLoading";
 
 const SalesReport = () => {
-  const [activeTab, setActiveTab] = useState("");
+  const [activeTab, setActiveTab] = useState("monthly");
 
   const [startDate, setStartDate] = useState(null);
   const [totalAmount, setTotalAmount] = useState("");
@@ -60,7 +61,7 @@ const SalesReport = () => {
   const [triggerDownload] = useLazyGetSalesPdfQuery();
   const [triggerDownloadXl] = useLazyGetSalesXlQuery()
 
-  const { data: salesReportData } = useGetSalesReportQuery(queryParams);
+  const { data: salesReportData , isLoading } = useGetSalesReportQuery(queryParams);
 
   useEffect(() => {
     if (salesReportData) {
@@ -78,43 +79,7 @@ const SalesReport = () => {
     console.log(totalAmount, "total amount");
   }, [salesData, totalAmount]);
 
-  /*
-    const handlePdfDownload = async () => {
-    try {
-      const response = await axiosInstance.get(
-        `/admin/download/report/pdf?period=${activeTab}&startDate=${startDate}&endDate=${endDate}`,
-        { responseType: "blob" }
-      );
-
-      const blob = new Blob([response.data], { type: "application/pdf" });
-      saveAs(blob, "SALES REPORT.pdf");
-
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const handleXldownload = async () => {
-    try {
-      const response = await axiosInstance.get(
-        `/admin/download/report/xl?period=${activeTab}&startDate=${startDate}&endDate=${endDate}`,
-        { responseType: "blob" }
-      );
-
-      const blob = new Blob([response.data], {
-        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      });
-      saveAs(blob, "SalesReport.xlsx");
-
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-
-
-
-  */
+ 
 
   const handleDownloadPdf = async () => {
     try {
@@ -154,6 +119,11 @@ const SalesReport = () => {
     const officialBlob = new Blob([blob], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
     saveAs(officialBlob, "SalesReport.xlsx");
   };
+
+
+  if(isLoading){
+    return <AdminLoading />
+  }
 
   return (
     <div className="container mx-auto py-10 px-4 sm:px-6 lg:px-8 font-primary">

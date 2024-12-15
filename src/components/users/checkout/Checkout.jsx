@@ -411,7 +411,7 @@ const Checkout = () => {
                   onValueChange={setPaymentMethod}
                 >
                   <div className="space-y-4 ">
-                    <div className="flex items-center space-x-2">
+                    {/* <div className="flex items-center space-x-2">
                       <RadioGroupItem value="wallet" id="wallet" />
                       <Label
                         htmlFor="wallet"
@@ -420,11 +420,12 @@ const Checkout = () => {
                         <Wallet className="h-5 w-5" />
                         <span>Wallet</span>
                       </Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
+                    </div> */}
+                    {/* <div className="flex items-center space-x-2">
                       <RadioGroupItem value="upi" id="upi" />
                       <Label
                         htmlFor="upi"
+                        disabled={true}
                         className="flex items-center space-x-2"
                       >
                         <svg
@@ -457,7 +458,7 @@ const Checkout = () => {
                         </svg>
                         <span>UPI</span>
                       </Label>
-                    </div>
+                    </div> */}
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value="razorpay" id="razorpay" />
                       <Label
@@ -485,7 +486,7 @@ const Checkout = () => {
                             strokeLinejoin="round"
                           />
                         </svg>
-                        <span>Razor Pay</span>
+                        <span>Online Payment</span>
                       </Label>
                     </div>
                     <div className="flex items-center space-x-2">

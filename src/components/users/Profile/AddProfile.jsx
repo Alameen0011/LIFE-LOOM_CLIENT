@@ -39,7 +39,7 @@ const AddProfile = () => {
   };
 
   return (
-    <div className="flex-1  p-6">
+    <div className="flex-1 p-6">
       <div className=" mb-6 flex items-center gap-2 text-sm text-muted-foreground">
         <Link href="#" className="hover:text-foreground">
           Home

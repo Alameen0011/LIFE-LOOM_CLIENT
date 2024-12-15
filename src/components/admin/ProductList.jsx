@@ -17,6 +17,7 @@ import {
 } from "@/app/service/adminApiSlice";
 import { toast } from "react-toastify";
 import Pagination from "../users/Pagination";
+import AdminLoading from "./adminLoading";
 
 const ProductList = () => {
   const navigate = useNavigate();
@@ -27,14 +28,9 @@ const ProductList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-  const { data, error, isLoading } = useFetchProductsQuery({
-    page: currentPage,
-    limit: itemsPerPage,
-  });
+  const { data, error, isLoading } = useFetchProductsQuery({ page: currentPage,  limit: itemsPerPage});
   const [productSoftDelete] = useSoftDeleteProductMutation();
 
-  if (isLoading) console.log("Loading...");
-  if (error) console.log("Error:", error);
 
   console.log(data, "hello");
 
@@ -64,13 +60,18 @@ const ProductList = () => {
     setTotalPages(data?.totalPages);
   }, [data]);
 
+  if (error) console.log("Error:", error);
+  
+  if (isLoading) {
+    return <AdminLoading/>
+  }
+
+
   return (
     <div className="container max-w-3xl mx-auto py-10 font-primary">
       <h1 className="text-2xl font-bold mb-6">Product Listing</h1>
       <div className="flex justify-between items-center mb-6">
         <div className="relative w-64">
-          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input placeholder="Search products" className="pl-8" />
         </div>
         <Button onClick={() => navigate("/admin/addProduct")}>
           <PlusCircle className="mr-2 h-4 w-4" /> Add New Product

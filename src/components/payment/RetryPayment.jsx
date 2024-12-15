@@ -60,7 +60,7 @@ const RetryPayment = ({amount,orderId}) => {
       },
       modal: {
         ondismiss: async () => {
-           toast.error("paymnet cancelled ..?")
+           toast.error("payment cancelled ")
         },
       },
     };
@@ -89,7 +89,6 @@ const RetryPayment = ({amount,orderId}) => {
         onClick={handlePayment}
       >
         Retry Payment
-        <LucideActivity className="h-4 w-4 ml-1" />
       </Button>
     </>
   );

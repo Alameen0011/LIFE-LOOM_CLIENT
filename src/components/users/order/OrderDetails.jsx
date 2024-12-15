@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { FileText } from "lucide-react";
+import { Download, FileText } from "lucide-react";
 import { useParams } from "react-router-dom";
 import {
   useGetSingleOrderQuery,
@@ -10,22 +10,42 @@ import { useState } from "react";
 import Modal from "@/components/admin/managementModal";
 import { toast } from "react-toastify";
 import { Box, CircularProgress } from "@mui/material";
-import OrderHistoryModal from "../OrderHIstoryModal";
+import { useLazyGetInvoiceDataQuery } from "@/app/service/userApiSlice";
+import { saveAs } from "file-saver";
+import UserLoading from "@/components/UserLoading";
+
 
 const OrderDetails = () => {
-  // const [showModal, setShowModal] = useState(false);
-  // const [orderId, setOrderId] = useState(null);
-  // const [itemId, setItemId] = useState(null);
+
+  
+  const { id } = useParams();
+
+  console.log(id, "id from useparams for single order details fetching");
+
+  const [triggerInvoiceDownload] = useLazyGetInvoiceDataQuery()
 
   const [orderCancel] = useOrderCancelMutation();
 
-  // const handleCancelOrderRequest = (orderId, itemId) => {
-  //   console.log(orderId, itemId, "clicked on button for cancel ");
-  //   setOrderId(orderId);
-  //   setItemId(itemId);
 
-  //   setShowModal(true);
-  // };
+  const handleInvoiceDownload = async () => {
+    try {
+      console.log(id,"order id while cliking ")
+
+      const res = await triggerInvoiceDownload({orderId:id}).unwrap()
+
+      console.log(res)
+
+      const blob = new Blob([res],{ type: "application/pdf"   })
+     
+
+      saveAs(blob,"invoice.pdf")
+      toast.success("invoice downloaded successfully")
+      
+    } catch (error) {
+      console.log(error,"error while downllading invoice")
+      toast.error("please try again later")
+    }
+  }
 
   const handleConfirmCancel = async (orderId, itemId) => {
     try {
@@ -38,33 +58,18 @@ const OrderDetails = () => {
     } catch (error) {
       console.log(error, "error while cancelling order");
       toast.error("please retry again some issue has arisen");
-    } finally {
-      setShowModal(false);
-    }
+    } 
   };
 
-  const { id } = useParams();
 
-  console.log(id, "id from useparams for single order details fetching");
+
 
   const { data, isLoading: singleDataLoading } = useGetSingleOrderQuery(id);
 
   console.log(data, "data from single order fetching");
 
   if (singleDataLoading) {
-    return (
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          height: "100vh",
-        }}
-      >
-        <CircularProgress />
-      </Box>
-    );
+    return <UserLoading/>
   }
 
   return (
@@ -93,10 +98,12 @@ const OrderDetails = () => {
             })}
           </p>
         </div>
-        {/* <Button variant="outline" className="gap-2">
+
+        
+        <Button onClick= {() => handleInvoiceDownload()} variant="outline" className="gap-2">
         <Download className="h-4 w-4" />
         Invoice
-      </Button> */}
+      </Button>
       </div>
 
       <div className="grid md:grid-cols-3 gap-6 font-primary">

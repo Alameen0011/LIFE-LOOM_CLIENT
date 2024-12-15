@@ -117,7 +117,6 @@ const OrderHistory = () => {
     setIsModalOpen(false);
   };
 
-
   const handleViewDetails = (orderId) => {
     console.log(orderId, "order id in view details click ");
     navigate(`/profile/order/${orderId}`);
@@ -139,7 +138,7 @@ const OrderHistory = () => {
           Accounts
         </Link>
         <ChevronRight className="h-4 w-4" />
-        <span className="text-foreground font-medium">Delivery address</span>
+        <span className="text-foreground font-medium">my orders</span>
       </div>
       <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">
@@ -148,113 +147,128 @@ const OrderHistory = () => {
           </h1>
 
           <div className="grid gap-3 md:grid-cols-1 lg:grid-cols-1">
-            {orders?.orders?.map((order) => (
-              <div
-                key={order?._id}
-                className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-300 ease-in-out"
-              >
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <p className="text-sm text-gray-500 font-primary">
-                      Order ID: {order?._id}
-                    </p>
-                    <p className="text-sm mt-2 font-semibold font-primary">
-                      {new Date(order?.createdAt).toLocaleString("en-US", {
-                        weekday: "short",
-                        year: "numeric",
-                        month: "short",
-                        day: "numeric",
-                        hour: "numeric",
-                        minute: "numeric",
-                      })}
-                    </p>
-                    {order.status === "Cancelled" && (
-                      <p className="text-sm text-red-500 font-semibold font-primary mt-1">
-                        Order is cancelled
-                      </p>
-                    )}
-                  </div>
-                </div>
-                <ul className="mb-4 space-y-2">
-                  {order.items.map((item) => (
-                    <li
-                      key={item._id}
-                      className="flex items-center justify-between text-sm font-primary"
-                    >
-                      <div className="flex items-center">
-                        <Package className="h-4 w-4 mr-2 text-gray-400" />
-                        <span>
-                          {item.product.productName} - (x{item.quantity}) - ₹
-                          {item.price}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center space-x-2">
-                        {/* Status Badge */}
-                        <Badge className={`${getStatusColor(item.status)}`}>
-                          {item.status}
-                        </Badge>
-
-                        {/* Conditional Buttons */}
-                        {item.status.toLowerCase() === "delivered" ? (
-                          // Show Return Button if Status is Delivered
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            className="text-sm"
-                            onClick={() =>
-                              handleReturnRequest(order._id, item._id)
-                            }
-                          >
-                            Return
-                            <X className="h-4 w-4 ml-1" />
-                          </Button>
-                        ) : item.status.toLowerCase() !== "cancelled" ? (
-                          // Show Cancel Button if Status is Not Cancelled
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            className="text-sm"
-                            onClick={() =>
-                              handleCancelRequest(order._id, item._id)
-                            }
-                          >
-                            Cancel
-                            <X className="h-4 w-4 ml-1" />
-                          </Button>
-                        ) : null}
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-                <div className="flex justify-between items-center font-primary">
-                  <p className="font-bold">
-                    Total: ₹{order?.totalAmount?.toFixed(2)}
-                  </p>
-                  <div className="space-x-2">
-                    {
-                       order.paymentDetails.status == "Failed" && (
-                        <RetryPayment
-                        amount={order?.totalAmount?.toFixed(2)} //finaltotal with discount in future
-                        orderId = {order._id}
-                        
-                        />
-                   
-                      ) 
-                    }
-                    <Button
-                      onClick={() => handleViewDetails(order._id)}
-                      variant="outline"
-                      size="sm"
-                      className="text-sm"
-                    >
-                      View Details
-                      <ChevronRight className="h-4 w-4 ml-1" />
-                    </Button>
-                  </div>
-                </div>
+            {orders?.orders.length === 0 ? (
+              <div className="flex flex-col items-center justify-center min-h-[50vh]  px-4 py-8 font-primary">
+                <h2 className="text-2xl md:text-3xl font-semibold text-gray-800 mt-4">
+                  No Orders Found
+                </h2>
+                <p className="text-gray-600 text-center mt-2 max-w-md">
+                  It seems like you haven’t placed any orders yet. Start
+                  exploring our collection now!
+                </p>
+                <Button
+                  onClick={() => navigate("/products")}
+                  size="lg"
+                  className="bg-black hover:bg-black text-white px-6 py-3 mt-3 rounded-md"
+                >
+                  Shop Now
+                </Button>{" "}
               </div>
-            ))}
+            ) : (
+              orders?.orders?.map((order) => (
+                <div
+                  key={order?._id}
+                  className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-300 ease-in-out"
+                >
+                  <div className="flex justify-between items-start mb-4">
+                    <div>
+                      <p className="text-sm text-gray-500 font-primary">
+                        Order ID: {order?._id}
+                      </p>
+                      <p className="text-sm mt-2 font-semibold font-primary">
+                        {new Date(order?.createdAt).toLocaleString("en-US", {
+                          weekday: "short",
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                          hour: "numeric",
+                          minute: "numeric",
+                        })}
+                      </p>
+                      {order.status === "Cancelled" && (
+                        <p className="text-sm text-red-500 font-semibold font-primary mt-1">
+                          Order is cancelled
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <ul className="mb-4 space-y-2">
+                    {order.items.map((item) => (
+                      <li
+                        key={item._id}
+                        className="flex items-center justify-between text-sm font-primary"
+                      >
+                        <div className="flex items-center">
+                          <Package className="h-4 w-4 mr-2 text-gray-400" />
+                          <span>
+                            {item.product.productName} - (x{item.quantity}) - ₹
+                            {item.price}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center space-x-2">
+                          {/* Status Badge */}
+                          <Badge className={`${getStatusColor(item.status)}`}>
+                            {item.status}
+                          </Badge>
+
+                          {/* Conditional Buttons */}
+                          {item.status.toLowerCase() === "delivered" ? (
+                            // Show Return Button if Status is Delivered
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              className="text-sm"
+                              onClick={() =>
+                                handleReturnRequest(order._id, item._id)
+                              }
+                            >
+                              Return
+                              <X className="h-4 w-4 ml-1" />
+                            </Button>
+                          ) : item.status.toLowerCase() !== "cancelled" ? (
+                            // Show Cancel Button if Status is Not Cancelled
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              className="text-sm"
+                              onClick={() =>
+                                handleCancelRequest(order._id, item._id)
+                              }
+                            >
+                              Cancel
+                              <X className="h-4 w-4 ml-1" />
+                            </Button>
+                          ) : null}
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="flex justify-between items-center font-primary">
+                    <p className="font-bold">
+                      Total: ₹{order?.totalAmount?.toFixed(2)}
+                    </p>
+                    <div className="space-x-2">
+                      {order.paymentDetails.status == "Failed" && (
+                        <RetryPayment
+                          amount={order?.totalAmount?.toFixed(2)} //finaltotal with discount in future
+                          orderId={order._id}
+                        />
+                      )}
+                      <Button
+                        onClick={() => handleViewDetails(order._id)}
+                        variant="outline"
+                        size="sm"
+                        className="text-sm"
+                      >
+                        View Details
+                        <ChevronRight className="h-4 w-4 ml-1" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
       </div>

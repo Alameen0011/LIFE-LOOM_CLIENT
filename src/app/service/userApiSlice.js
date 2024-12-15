@@ -178,6 +178,15 @@ export const userApiSlice = apiSlice.injectEndpoints({
       })
     }),
 
+    getInvoiceData: builder.query({
+      query: ({orderId}) => ({ 
+        url: `/user/invoice`,
+        params: {orderId},
+        method: "GET",
+        responseHandler: (response) => response.blob()
+      })
+    })
+
 
 
 
@@ -207,5 +216,6 @@ export const {
   useFetchRefferalCodeQuery,
   useGetCheckRefferalQuery,
   useApplyRefferalCodeMutation,
-  useSkipRefferalCodeMutation
+  useSkipRefferalCodeMutation,
+  useLazyGetInvoiceDataQuery
 } = userApiSlice;

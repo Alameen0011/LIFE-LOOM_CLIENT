@@ -27,10 +27,7 @@ import {
 } from "recharts";
 
 const Dashboard = () => {
-  const [filters, setFilters] = useState({
-    year: new Date().getFullYear(),
-    month: "",
-  });
+  const [filters, setFilters] = useState({  year: new Date().getFullYear(),  month: "", });
 
   const { data: topSellers } = useGetBestSellingQuery();
   const {data: metrics} = useGetDashboardDataQuery()
@@ -104,9 +101,9 @@ const Dashboard = () => {
             <div style={{ width: "100%", height: 400 }}>
             
               {isLoading ? (
-                <p>Loading...</p> // Display loading spinner or message
+                <p>Loading...</p> 
               ) : isError ? (
-                <p>Error fetching data. Please try again.</p> // Handle errors
+                <p>Error fetching data. Please try again.</p> 
               ) : (
                 <ResponsiveContainer>
                   <LineChart

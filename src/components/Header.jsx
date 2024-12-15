@@ -46,7 +46,7 @@ const Header = () => {
   };
 
   return (
-    <header className="bg-white shadow-md">
+    <header className="bg-white shadow-md sticky top-0 z-50">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 pr-5">
           {/* Left: Brand Name */}
@@ -173,17 +173,17 @@ const Header = () => {
         <div className="md:hidden">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
             <Link
-              to="/products"
+              to="/"
               className="font-primary block text-gray-600 hover:text-gray-900 py-2"
             >
               Home
             </Link>
 
             <Link
-              to="/contact"
+              to="/products"
               className=" font-primary   block text-gray-600 hover:text-gray-900 py-2"
             >
-              Contact Us
+             Shop
             </Link>
             <Link
               to="/about"
@@ -215,10 +215,10 @@ const Header = () => {
                   strokeLinejoin="round"
                 />
               </svg>
-              Wishlist
+         
             </Link>
             <Link
-              to="/account"
+              to="/profile/myProfile"
               className="flex items-center text-gray-600 hover:text-gray-900 py-2"
             >
               <svg
@@ -233,14 +233,14 @@ const Header = () => {
                   fill="black"
                 />
               </svg>
-              Account
+           
             </Link>
             <Link
               to="/cart"
               className="flex items-center text-gray-600 hover:text-gray-900 py-2"
             >
               <ShoppingCart className="h-6 w-6 fill-black text-black " />
-              Cart
+              
             </Link>
           </div>
         </div>

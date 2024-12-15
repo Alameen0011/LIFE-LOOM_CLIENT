@@ -245,14 +245,7 @@ export const adminApiSlice = apiSlice.injectEndpoints({
       }),
     }),
 
-    getInvoiceData: builder.query({
-      query: ({orderId}) => ({ 
-        url: `/admin/invoice`,
-        params: {orderId},
-        method: "GET",
-        responseHandler: (response) => response.blob()
-      })
-    })
+ 
 
 
    
@@ -294,5 +287,5 @@ export const {
   useGetDashboardDataQuery,
   useLazyGetSalesPdfQuery,
   useLazyGetSalesXlQuery,
-  useLazyGetInvoiceDataQuery
+  
 } = adminApiSlice;

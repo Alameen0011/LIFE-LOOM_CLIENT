@@ -2,24 +2,10 @@ import {
   useDeleteOfferMutation,
   useFetchOffersQuery,
 } from "@/app/service/offerApiSlice";
+import AdminLoading from "@/components/admin/adminLoading";
 import OfferTable from "@/components/admin/OfferTable";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Filter, Plus, Search } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -27,7 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 const Offer = () => {
-  const { data, isSuccess } = useFetchOffersQuery();
+  const { data, isSuccess , isLoading } = useFetchOffersQuery();
   const [removeOffer] = useDeleteOfferMutation();
   const [offers, setOffers] = useState([]);
   const [filter, setFilter] = useState("active");
@@ -80,6 +66,10 @@ const Offer = () => {
   const handleAddOffer = () => {
     navigate("/admin/addOffer", { state: { activeTab: selectedTab } });
   };
+
+  if(isLoading){
+    return <AdminLoading/>
+  }
 
   return (
     <div className="container mx-auto max-w-4xl p-4 space-y-6 font-primary">

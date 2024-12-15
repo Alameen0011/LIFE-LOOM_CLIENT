@@ -1,17 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Download, FileText } from "lucide-react";
+import {  FileText } from "lucide-react";
 import { useParams } from "react-router-dom";
 import {
   useAdminOrderCancelMutation,
   useFetchSingleOrderQuery,
-  useLazyGetInvoiceDataQuery,
+
   useUpdateOrderIndividualItemStatusMutation,
 } from "@/app/service/adminApiSlice";
 import Modal from "./managementModal";
 import { toast } from "react-toastify";
-import { saveAs } from "file-saver";
 
 const AdminOrderDetails = () => {
   const [showModal, setShowModal] = useState(false);
@@ -25,7 +24,6 @@ const AdminOrderDetails = () => {
   const { data } = useFetchSingleOrderQuery(id);
   const [orderCancel] = useAdminOrderCancelMutation();
   const [itemStatusChange] = useUpdateOrderIndividualItemStatusMutation();
-  const [triggerInvoiceDownload] = useLazyGetInvoiceDataQuery()
 
   const handleCancelOrderRequest = (orderId, itemId) => {
     console.log(orderId, itemId, "clicked on button for cancel ");
@@ -54,25 +52,7 @@ const AdminOrderDetails = () => {
     }
   };
 
-  const handleInvoiceDownload = async () => {
-    try {
-      console.log(id,"order id while cliking ")
-
-      const res = await triggerInvoiceDownload({orderId:id}).unwrap()
-
-      console.log(res)
-
-      const blob = new Blob([res],{ type: "application/pdf"   })
-     
-
-      saveAs(blob,"invoice.pdf")
-      toast.success("invoice downloaded successfully")
-      
-    } catch (error) {
-      console.log(error,"error while downllading invoice")
-      toast.error("please try again later")
-    }
-  }
+ 
 
   const handleConfirmCancel = async () => {
     console.log(orderId, itemId, "order id,itemId");
@@ -113,10 +93,7 @@ const AdminOrderDetails = () => {
             orderId: {data?.order?._id}
           </p>
         </div>
-         <Button onClick= {() => handleInvoiceDownload()}  variant="outline" className="gap-2">
-        <Download className="h-4 w-4" />
-        Invoice
-      </Button> 
+  
       </div>
 
       <div className="grid md:grid-cols-3 gap-6">
@@ -195,7 +172,7 @@ const AdminOrderDetails = () => {
           <CardTitle>Order Items</CardTitle>
         </CardHeader>
         <CardContent>
-          {data?.order?.items?.map((item, index) => (
+          {data?.order?.items?.map((item) => (
             <div
               key={item._id}
               className="flex flex-col md:flex-row items-start gap-6 p-4 border rounded-lg"

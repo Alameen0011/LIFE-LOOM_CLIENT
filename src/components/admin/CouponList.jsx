@@ -6,12 +6,13 @@ import { useNavigate } from 'react-router-dom'
 import { useDeleteCouponMutation, useGetCouponQuery } from '@/app/service/adminApiSlice'
 import { toast } from 'react-toastify'
 import Modal from './managementModal'
+import AdminLoading from './adminLoading'
 
 const CouponList = () => {
 
     const [coupon,setCoupon] = useState()
     const [isModalOpen,setIsModalOpen] = useState(false)
-      const {data:couponData} = useGetCouponQuery()
+      const {data:couponData , isLoading} = useGetCouponQuery()
       const [deleteCoupon] = useDeleteCouponMutation()
     
       const navigate = useNavigate()
@@ -47,6 +48,11 @@ const CouponList = () => {
         console.log('Add coupon clicked')
         navigate("/admin/addCoupon")
         
+      }
+
+
+      if(isLoading){
+        return <AdminLoading/>
       }
     
 

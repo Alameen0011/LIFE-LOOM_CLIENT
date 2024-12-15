@@ -14,6 +14,7 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { toast } from "react-toastify";
 import Pagination from "../users/Pagination";
+import AdminLoading from "./adminLoading";
 
 const CategoryList = () => {
 
@@ -29,7 +30,7 @@ const CategoryList = () => {
 
 
 
-  const { data } = useFetchCategoriesQuery({page:currentPage,limit:itemsPerPage});
+  const { data,isLoading } = useFetchCategoriesQuery({page:currentPage,limit:itemsPerPage});
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [isModalOpen, setModalOpen] = useState(false);
   const [isConfirmModalOpen, setConfirmModalOpen] = useState(false); // Manage confirm modal
@@ -136,6 +137,11 @@ const CategoryList = () => {
     setTotalPages(data?.totalPages)
 
   },[data])
+
+
+  if(isLoading){
+    return <AdminLoading/>
+  }
 
   return (
     <div className="mt-8">

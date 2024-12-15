@@ -20,7 +20,7 @@ const SalesFilter = ({ onFilterChange }) => {
   };
 
   return (
-    <div className="filter-form">
+    <div className="filter-form mr-5">
       <label htmlFor="year">Year:</label>
       <select id="year" value={year} onChange={handleYearChange}>
         <option value="">Select Year</option>
@@ -34,7 +34,7 @@ const SalesFilter = ({ onFilterChange }) => {
         })}
       </select>
 
-      <label htmlFor="month">Month:</label>
+      <label htmlFor="month" >Month:</label>
       <select id="month" value={month} onChange={handleMonthChange}>
         <option value="">Select Month</option>
         {[
