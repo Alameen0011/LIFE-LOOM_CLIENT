@@ -10,7 +10,7 @@ import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useSelector, useDispatch } from "react-redux";
 import { userlogout } from "@/app/slices/authSlice";
-import AdminLoading from "@/components/admin/adminLoading";
+import AdminLoading from "@/components/admin/AdminLoading";
 
 const UserManagement = () => {
   const [showModal, setShowModal] = useState(false);
