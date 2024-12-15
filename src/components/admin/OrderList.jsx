@@ -28,7 +28,7 @@ import Modal from "./managementModal";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import AdminReturnModal from "./AdminReturnModal";
-import AdminLoading from "./adminLoading";
+import AdminLoading from "./AdminLoading";
 
 
 

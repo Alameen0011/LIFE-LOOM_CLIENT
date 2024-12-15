@@ -14,7 +14,7 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { toast } from "react-toastify";
 import Pagination from "../users/Pagination";
-import AdminLoading from "./adminLoading";
+import AdminLoading from "./AdminLoading";
 
 const CategoryList = () => {
 

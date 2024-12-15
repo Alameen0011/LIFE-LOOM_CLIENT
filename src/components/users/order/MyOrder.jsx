@@ -1,6 +1,6 @@
 import SideBar from '../Profile/SideBar'
-import OrderHistory from './orderHistory'
-
+import OrderHistory from './OrderHistory'
+OrderHistory
 const MyOrder = () => {
   return (
     <div className="flex  min-h-screen mx-auto max-w-5xl my-10 bg-background">

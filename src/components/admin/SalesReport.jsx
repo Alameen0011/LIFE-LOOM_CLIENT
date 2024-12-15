@@ -17,7 +17,7 @@ import Pagination from "../users/Pagination";
 import { DownloadCloud, FileSpreadsheetIcon } from "lucide-react";
 import { saveAs } from "file-saver";
 import { toast } from "react-toastify";
-import AdminLoading from "./adminLoading";
+import AdminLoading from "./AdminLoading";
 
 const SalesReport = () => {
   const [activeTab, setActiveTab] = useState("monthly");

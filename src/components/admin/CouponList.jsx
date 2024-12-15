@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom'
 import { useDeleteCouponMutation, useGetCouponQuery } from '@/app/service/adminApiSlice'
 import { toast } from 'react-toastify'
 import Modal from './managementModal'
-import AdminLoading from './adminLoading'
+import AdminLoading from "./AdminLoading";
 
 const CouponList = () => {
 
