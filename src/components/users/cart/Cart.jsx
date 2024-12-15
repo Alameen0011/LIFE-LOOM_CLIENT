@@ -10,8 +10,8 @@ import { Minus, Plus, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import CartNotFound from "./CartNotFound";
-import OrderHistoryModal from "../orderHIstoryModal";
 import UserLoading from "@/components/UserLoading";
+import OrderHistoryModal from "../OrderHistoryModal";
 
 const Cart = () => {
   const [showModal, setShowModal] = useState(false);
