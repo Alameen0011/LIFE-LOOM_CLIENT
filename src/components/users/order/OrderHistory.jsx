@@ -4,17 +4,17 @@ import {
 } from "@/app/service/orderApiSlice";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ChevronRight, LucideActivity, Package, X } from "lucide-react";
+import { ChevronRight,  Package, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import Modal from "@/components/admin/managementModal";
 import { useNavigate } from "react-router-dom";
 import Pagination from "../Pagination";
 import { toast } from "react-toastify";
 import ReturnModal from "@/components/admin/ReturnModal";
 import { useReturnOrderRequestMutation } from "@/app/service/userApiSlice";
-import OrderHistoryModal from "../orderHIstoryModal";
 import RetryPayment from "@/components/payment/RetryPayment";
+import OrderHistoryModal from "../OrderHistoryModal";
+
 
 const OrderHistory = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -31,7 +31,7 @@ const OrderHistory = () => {
     page: currentPage,
     limit: itemsPerPage,
   });
-  const [orderCancel, { data }] = useOrderCancelMutation();
+  const [orderCancel] = useOrderCancelMutation();
   const [returnRequest] = useReturnOrderRequestMutation();
 
   console.log(orders, "orders");
