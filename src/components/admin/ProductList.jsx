@@ -17,7 +17,7 @@ import {
 } from "@/app/service/adminApiSlice";
 import { toast } from "react-toastify";
 import Pagination from "../users/Pagination";
-import AdminLoading from "./adminLoading";
+import AdminLoading from "./AdminLoading";
 
 const ProductList = () => {
   const navigate = useNavigate();
