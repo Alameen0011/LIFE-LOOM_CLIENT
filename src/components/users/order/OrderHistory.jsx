@@ -13,8 +13,7 @@ import { toast } from "react-toastify";
 import ReturnModal from "@/components/admin/ReturnModal";
 import { useReturnOrderRequestMutation } from "@/app/service/userApiSlice";
 import RetryPayment from "@/components/payment/RetryPayment";
-import OrderHistoryModal from "../OrderHistoryModal";
-
+import OrderHistoryModal from "@/components/users/OrderHistoryModal";
 
 const OrderHistory = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);

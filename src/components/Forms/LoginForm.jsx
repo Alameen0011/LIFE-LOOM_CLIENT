@@ -235,6 +235,17 @@ const LoginForm = () => {
             </Link>
           </p>
         </div>
+        <div className="text-center mt-4">
+          <p className="text-sm text-gray-600">
+      
+            <Link
+              to="/admin/login"
+              className="text-black  font-primary  hover:text-indigo-500 font-medium"
+            >
+                 admin
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );

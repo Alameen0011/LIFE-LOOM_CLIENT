@@ -11,7 +11,8 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import CartNotFound from "./CartNotFound";
 import UserLoading from "@/components/UserLoading";
-import OrderHistoryModal from "../OrderHistoryModal";
+import OrderHistoryModal from "@/components/users/order/OrderHistoryModal";
+
 
 const Cart = () => {
   const [showModal, setShowModal] = useState(false);
