@@ -132,7 +132,7 @@ const EmptyState = () => {
 }
 
 const Wishlist = () => {
-  const { data: wishListData } = useFetchWishlistQuery();
+  const { data: wishListData ,isError } = useFetchWishlistQuery();
   const [removeWishlist] = useRemoveWishlistMutation();
   const [wishlistItems, setWishlistItems] = useState([]);
 
@@ -158,7 +158,7 @@ const Wishlist = () => {
   return (
     <div className="flex-1 container mx-auto max-w-3xl p-6 bg-gray-20 min-h-screen font-primary ">
       <h1 className="text-xl font-bold mb-6">My Wishlist</h1>
-      {wishlistItems?.products?.length === 0 ? (
+      {wishlistItems?.products?.length === 0 || isError ? (
         <EmptyState />
       ) : (
         <div className="grid gap-4">

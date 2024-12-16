@@ -13,12 +13,11 @@ import CartNotFound from "./CartNotFound";
 import UserLoading from "@/components/UserLoading";
 import OrderHistoryReModal from "@/components/users/OrderHistoryReModal";
 
-
 const Cart = () => {
   const [showModal, setShowModal] = useState(false);
   const [itemId, setItemId] = useState(null);
 
-  const { data: cartItems ,isLoading } = useGetCartQuery();
+  const { data: cartItems, isLoading, isError } = useGetCartQuery();
   const [updateCartQuantity] = useUpdateCartQuantityMutation();
   const [clearCart] = useClearCartMutation();
   const navigate = useNavigate();
@@ -96,9 +95,8 @@ const Cart = () => {
 
   const total = subTotal;
 
-
-  if(isLoading){
-    return <UserLoading/>
+  if (isLoading) {
+    return <UserLoading />;
   }
 
   return (
@@ -230,32 +228,23 @@ const Cart = () => {
                   <span>₹{subTotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between mb-2 font-primary">
-                  <span>shipping</span>
+                  <span>Shipping</span>
                   <span>Free</span>
                 </div>
-                {/* <Separator className="my-4" /> */}
                 <div className="flex justify-between mb-4 font-primary">
                   <span className="font-semibold">Total</span>
                   <span className="font-semibold">₹{total.toFixed(2)}</span>
                 </div>
-                {cartItems?.cart?.items?.length === 0 ? (
-                  <Button
-                    disabled={true}
-                    onClick={handleCheckout}
-                    className="w-full font-primary"
-                  >
-                    Proceed to Checkout
-                  </Button>
-                ) : (
-                  <Button onClick={handleCheckout} className="w-full">
-                    Proceed to Checkout
-                  </Button>
-                )}
+                <Button
+                  disabled={cartItems?.cart?.items?.length === 0 || isError}
+                  onClick={handleCheckout}
+                  className="w-full font-primary"
+                >
+                  Proceed to Checkout
+                </Button>
               </div>
             </div>
-          ) : (
-            null
-          )}
+          ) : null}
         </div>
       </div>
 
