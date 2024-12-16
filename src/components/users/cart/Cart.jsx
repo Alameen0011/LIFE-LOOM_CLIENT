@@ -11,7 +11,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import CartNotFound from "./CartNotFound";
 import UserLoading from "@/components/UserLoading";
-import OrderHistoryModal from "@/components/users/OrderHistoryModal";
+import OrderHistoryReModal from "@/components/users/OrderHistoryReModal";
 
 
 const Cart = () => {
@@ -259,7 +259,7 @@ const Cart = () => {
         </div>
       </div>
 
-      <OrderHistoryModal
+      <OrderHistoryReModal
         title="Are you sure you want to remove this product?"
         message="This action cannot be undone."
         isOpen={showModal}

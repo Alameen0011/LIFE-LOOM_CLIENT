@@ -13,7 +13,7 @@ import { toast } from "react-toastify";
 import ReturnModal from "@/components/admin/ReturnModal";
 import { useReturnOrderRequestMutation } from "@/app/service/userApiSlice";
 import RetryPayment from "@/components/payment/RetryPayment";
-import OrderHistoryModal from "@/components/users/OrderHistoryModal";
+import OrderHistoryReModal from "@/components/users/OrderHistoryReModal";
 
 const OrderHistory = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -277,7 +277,7 @@ const OrderHistory = () => {
         paginate={paginate}
       />
 
-      <OrderHistoryModal
+      <OrderHistoryReModal
         title="Are you sure you want to cancel this order?"
         message="This action cannot be undone."
         isOpen={isModalOpen}

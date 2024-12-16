@@ -5,7 +5,7 @@ import {getAuth,GoogleAuthProvider} from "firebase/auth"
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: import.meta.env.REACT_APP_FIREBASE_API_KEY,
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: "life-206db.firebaseapp.com",
   projectId: "life-206db",
   storageBucket: "life-206db.appspot.com",
@@ -13,6 +13,9 @@ const firebaseConfig = {
   appId: "1:765523807741:web:9c4fbb8a482ad0fdd99d94",
   measurementId: "G-7NRJ2FJXTB"
 };
+
+
+
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
