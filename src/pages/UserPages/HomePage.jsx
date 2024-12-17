@@ -7,39 +7,60 @@ import { Button } from "@/components/ui/button";
 
 import ReferralPopup from "@/components/users/ReferralPopup";
 import { useNavigate } from "react-router-dom";
-// import { Card, CardContent } from "../ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Star } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { useSelector } from "react-redux";
+import { selectUserState } from "@/app/slices/authSlice";
 
 const HomePage = () => {
   const [showPopup, setShowPopup] = useState(false);
   const navigate = useNavigate();
 
-  const { data: checkRefferal, refetch: refetchRefferal } =
-    useGetCheckRefferalQuery();
+  const isAuthenticated = useSelector(selectUserState);
 
-  useEffect(() => {
-    console.log(checkRefferal, "checking refferal");
-    if (checkRefferal && checkRefferal.seenRefferal == false) {
-      setShowPopup(true);
-    }
-  }, [checkRefferal]);
-
-  useEffect(() => {
-    refetchRefferal();
-  }, []);
 
   const { data: trending, isLoading } = useGetHomeProductsQuery();
+  const { data: checkRefferal, refetch: refetchRefferal } = useGetCheckRefferalQuery(
+    {}, 
+    { skip: !isAuthenticated }
+  );
 
-  if (isLoading) {
-    <h4>Loading...</h4>;
-  }
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      refetchRefferal()
+        .then(({ data }) => {
+          if (data?.seenRefferal === false) {
+            setShowPopup(true); 
+          } else {
+            setShowPopup(false); 
+          }
+        })
+        .catch((error) => {
+          console.error("Failed to fetch referral data:", error);
+          setShowPopup(false);
+        });
+    } else {
+      setShowPopup(false); 
+    }
+  }, [isAuthenticated, refetchRefferal]);
+
 
   const handleProductDetails = (id) => {
     console.log(`Navigate to product details of ID: ${id}`);
     navigate(`/products/${id}`);
   };
+
+
+  
+
+
+  if (isLoading) {
+    <h4>Loading...</h4>;
+  }
+
+
 
   return (
     <div className="min-h-screen bg-white overflow-y-auto">

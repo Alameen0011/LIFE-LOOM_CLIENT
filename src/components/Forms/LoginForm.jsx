@@ -56,13 +56,18 @@ const LoginForm = () => {
      
 
       const res = await googleAuth({ idToken }).unwrap();
+
+      console.log(res,"respnose from  google auth api from server")
+
       const data = {
-        user: res._id,
+        _id: res._id,
+        username:res.username,
         role: res.role,
         accessToken: res.accessToken,
       };
 
       dispatch(setUserCredentials(data));
+
       navigate("/", { replace: true });
     } catch (error) {
       console.error("Error code:", error.code);
@@ -229,7 +234,7 @@ const LoginForm = () => {
             Don&apos;t have an account?{" "}
             <Link
               to="/auth/signup"
-              className="text-black  font-primary  hover:text-indigo-500 font-medium"
+              className="font-medium font-tertiary text-indigo-600 hover:text-indigo-500"
             >
               Sign up here
             </Link>
@@ -238,11 +243,11 @@ const LoginForm = () => {
         <div className="text-center mt-4">
           <p className="text-sm text-gray-600">
       
-            <Link
+          <Link
               to="/admin/login"
-              className="text-black  font-primary  hover:text-indigo-500 font-medium"
+              className="font-medium font-tertiary text-indigo-600 hover:text-indigo-500"
             >
-                 admin
+              admin login
             </Link>
           </p>
         </div>

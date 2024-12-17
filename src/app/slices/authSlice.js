@@ -6,7 +6,7 @@ const initialState = localStorage.getItem('auth') ? JSON.parse(localStorage.getI
             name: null,
             accessToken: null,
             role: null,
-            isAuthenticated:null,
+            isAuthenticated:false,
             id:null
         }
     }
@@ -22,10 +22,10 @@ const authSlice = createSlice({
             console.log("ACTIOIN PAYLOAD SETTING TO STATE",action.payload)
             const {username,accessToken,role,_id} = action.payload
 
-            console.log(username)
-            console.log(accessToken)
-            console.log(role)
-            console.log(_id)
+            console.log(username,"uername")
+            console.log(accessToken,"accessToken")
+            console.log(role,"role")
+            console.log(_id,"_id...")
             
             state.user.isAuthenticated = true;
             state.user.name = username
@@ -40,7 +40,7 @@ const authSlice = createSlice({
             state.user.accessToken = null
             state.user.role = null
             state.user.name = null
-            state.user.isAuthenticated = null
+            state.user.isAuthenticated = false
             state.user.id = null
             localStorage.setItem('auth', JSON.stringify({ ...initialState, user: { accessToken: null, role: null,name:null ,isAuthenticated:null,id:null} }))
         }

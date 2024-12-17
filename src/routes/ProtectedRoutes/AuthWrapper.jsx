@@ -9,14 +9,11 @@ const AuthWrapper = () => {
     console.log("Authenticated:", isAuthenticated)
     console.log("Role:", role);
    
-    console.log(location,"location object")        // Getting the current location for redirection
 
-    
-        // isAuthenticated && role === 'user' ? <Outlet /> : <Navigate to='/auth/login' state={{ from: location }} /> // Redirect to login
- 
       
         if (isAuthenticated && role === 'user') {
           console.log("Rendering Outlet");
+          console.log("navigating to homepage for authenticated users")
           return  <Navigate to="/"  replace  />
         } else {
           console.log("Redirecting to login");
